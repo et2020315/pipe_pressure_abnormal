@@ -7,6 +7,8 @@ object_ids_testing_subgraph = \
      762, 765, 763, 867, 768,
      772, 773]
 
+def numbers_to_str_list(numbers):
+    return ",".join([str(i) for i in numbers])
 
 def get_testing_subgraph_polylines(object_ids_testing_subgraph = [], MapServerID = UESMapServer.DOMESTIC_HOT_WATER):
     polylines = []
@@ -15,7 +17,11 @@ def get_testing_subgraph_polylines(object_ids_testing_subgraph = [], MapServerID
         UES_API_URL,
         MapServerID,
         # get the objectIds into a string in the form "X,Y,Z"
-        query={"objectIds": ",".join([str(i) for i in object_ids_testing_subgraph]) } if len(object_ids_testing_subgraph) else {'where': '1=1'},
+        query=
+            {"objectIds": numbers_to_str_list(object_ids_testing_subgraph) }
+            if len(object_ids_testing_subgraph)
+            #get all objects BUT THIS HAS a limit of 2000 response objects
+            else {'where': "1=1"},
         printurl=True
     ).json()
     for group in request_json["features"]:
