@@ -45,6 +45,7 @@ conda-repo-cli @ file:///tmp/build/80754af9/conda-repo-cli_1620168426516/work
 conda-token @ file:///tmp/build/80754af9/conda-token_1620076980546/work
 conda-verify==3.4.2
 contextlib2==0.6.0.post1
+cors==1.0.1
 cryptography @ file:///C:/ci/cryptography_1616769344312/work
 cycler==0.10.0
 Cython @ file:///C:/ci/cython_1618435363327/work
@@ -193,6 +194,7 @@ qtconsole @ file:///tmp/build/80754af9/qtconsole_1616775094278/work
 QtPy==1.9.0
 regex @ file:///C:/ci/regex_1617569893741/work
 requests @ file:///tmp/build/80754af9/requests_1608241421344/work
+requests-file==1.5.1
 rope @ file:///tmp/build/80754af9/rope_1602264064449/work
 Rtree @ file:///C:/ci/rtree_1618421009405/work
 ruamel-yaml-conda @ file:///C:/ci/ruamel_yaml_1616016967756/work
@@ -231,6 +233,7 @@ textdistance @ file:///tmp/build/80754af9/textdistance_1612461398012/work
 threadpoolctl @ file:///tmp/tmp9twdgx9k/threadpoolctl-2.1.0-py3-none-any.whl
 three-merge @ file:///tmp/build/80754af9/three-merge_1607553261110/work
 tifffile @ file:///tmp/build/80754af9/tifffile_1619636090847/work
+tldextract==3.1.2
 toml @ file:///tmp/build/80754af9/toml_1616166611790/work
 toolz @ file:///home/linux1/recipes/ci/toolz_1610987900194/work
 tornado @ file:///C:/ci/tornado_1606942392901/work
