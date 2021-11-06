@@ -8,14 +8,15 @@ object_ids_testing_subgraph = \
      772, 773]
 
 
-def get_testing_subgraph_polylines():
+def get_testing_subgraph_polylines(object_ids_testing_subgraph = [], MapServerID = UESMapServer.DOMESTIC_HOT_WATER):
     polylines = []
 
     request_json = arcgis_api_request(
         UES_API_URL,
-        UESMapServer.DOMESTIC_HOT_WATER,
+        MapServerID,
         # get the objectIds into a string in the form "X,Y,Z"
-        {"objectIds": ",".join([str(i) for i in object_ids_testing_subgraph])}
+        query={"objectIds": ",".join([str(i) for i in object_ids_testing_subgraph]) } if len(object_ids_testing_subgraph) else {'where': '1=1'},
+        printurl=True
     ).json()
     for group in request_json["features"]:
         polylines.append(group["geometry"]["paths"][0])

@@ -7,7 +7,7 @@ from pyproj import transform, Transformer
 UES_API_URL = "https://ues-arc.tamu.edu/arcgis/rest/services" + "/Yoho/UES_Operations/MapServer/"
 TAMU_BASEMAP_API_URL = "https://gis.tamu.edu/arcgis/rest/services/FCOR/TAMU_BaseMap/MapServer/"
 POST_FIX = "/query?"
-
+transformer = Transformer.from_crs('epsg:32139', 'epsg:4326')
 
 # arcgis map servers
 class UESMapServer(Enum):
@@ -28,7 +28,6 @@ class TAMUBaseMapServer(Enum):
 
 
 def convertToLatLng(x1, y1):
-    transformer = Transformer.from_crs('epsg:32139', 'epsg:4326')
     x2, y2 = transformer.transform(x1, y1)
 
     return x2, y2
