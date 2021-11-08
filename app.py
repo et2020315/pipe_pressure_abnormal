@@ -17,7 +17,7 @@ def hello_world():  # put application's code here
 
 @app.route('/test_pipes')
 def test_pipes():
-    testing_subgraph_polylines = get_testing_subgraph_polylines(MapServerID=UESMapServer.DOMESTIC_COLD_WATER)
+    testing_subgraph_polylines = get_testing_subgraph_polylines(MapServerID=UESMapServer.DOMESTIC_HOT_WATER)
     new_polylines = []
     for item in testing_subgraph_polylines:
         new_polylines.append([])
@@ -25,9 +25,19 @@ def test_pipes():
             coords = convertToLatLng(pair[0], pair[1])
             new_polylines[len(new_polylines) - 1].append({'lat': coords[0], 'lng': coords[1]})
 
-
     return { 'data': new_polylines}
 
+@app.route('/test_cold_pipes')
+def test_cold_pipes():
+    testing_subgraph_polylines_cold = get_testing_subgraph_polylines(MapServerID=UESMapServer.DOMESTIC_COLD_WATER)
+    new_polylines = []
+    for item in testing_subgraph_polylines_cold:
+        new_polylines.append([])
+        for pair in item:
+            coords = convertToLatLng(pair[0], pair[1])
+            new_polylines[len(new_polylines) - 1].append({'lat': coords[0], 'lng': coords[1]})
+
+    return { 'data': new_polylines}
 
 if __name__ == '__main__':
     app.run(debug=True)

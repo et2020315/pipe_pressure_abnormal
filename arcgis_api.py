@@ -35,7 +35,10 @@ def convertToLatLng(x1, y1):
 
 def arcgis_api_request(base_api_url, ServerNum, query={}, printurl = False):
     # encode the query map into a html query string, we may need to escape some characters
+    # for i in query.keys():
+    #     print(i)
     querystr = "".join([ "&" + key + "=" + html.escape(query[key].replace("=", "%3D")) for key in query.keys()])
+    # print("QueryStr: ", querystr)
     url = base_api_url + str(ServerNum.value) + POST_FIX + querystr + "&f=pjson"
     if printurl:
         print("URL:", url)
@@ -49,8 +52,9 @@ def arcgis_api_request(base_api_url, ServerNum, query={}, printurl = False):
 if __name__ == "__main__":
     #**********example usages
     #testing with hot water
-    hot_pipes_dict = arcgis_api_request(UES_API_URL, UESMapServer.DOMESTIC_HOT_WATER, {"where": "1=1", "outFields": "objectid"}, True).json()["features"]
-
+    hot_pipes_dict = arcgis_api_request(UES_API_URL, UESMapServer.DOMESTIC_HOT_WATER, {"where": "1=1", "outFields": "objectid", "resultOffset": "8000"}, True).json()["features"]
+    for i in hot_pipes_dict:
+        print(i)
     features_dict = arcgis_api_request(TAMU_BASEMAP_API_URL, TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, {"text": "Hall", "outFields": "objectid"}, True).json()["features"]
 
     # convert from projected coordinates to coordinate system (testing for now)
