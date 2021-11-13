@@ -46,6 +46,8 @@ def get_refined_df(filename, headers_mapping):
     # filter out string values
     cols = list(headers_mapping.values())
     dtf[cols] = dtf[cols].applymap(lambda x: x if isNumber(x) else np.nan)
+    # convert to float
+    dtf[cols] = dtf[cols].astype(np.float16)
 
     # convert time to timeseries objects
     dtf['new_time'] = dtf['<>Date'] + " " + dtf['Time']
@@ -64,7 +66,7 @@ def get_df(water_type, data_type):
     return df, headers_mapping.values()
 
 
-def plot_water(water_type, data_type, start_date, end_date, selected_buildings):
+def plot_water(water_type, data_type, start_date, end_date, selected_buildings, ylim=[]):
     df, buildings = get_df(water_type, data_type)
 
     fig = plt.figure()
@@ -77,17 +79,16 @@ def plot_water(water_type, data_type, start_date, end_date, selected_buildings):
         if not building in selected_buildings:
             continue
         # only plots buildings who have data
-        try:
-            if len(df[building].dropna()):
-                ax1.scatter(df["new_time"], df[building], s=0.7, label=building)
-        except:
-            print('error')
 
+        if len(df[building].dropna()):
+            ax1.scatter(df["new_time"], df[building], s=0.7, label=building)
+
+    if ylim and len(ylim): ax1.set_ylim(ylim)
     ax1.legend()
     ax1.figure.show()
 
 
 if __name__ == "__main__":
-    plot_water("CHW", "SUP", "2021-01-01", "2021-05-05", ['0407_CHW.PSP'])
+    plot_water("HW", "GPM", "2021-03-15", "2021-10-05", ['0358_HW.GPM'], ylim=[])
     # print(get_df("HW", "RET"))
     # df = get_df("CHW", "GPM")['0402_HW.GPM'] # single series
