@@ -6,9 +6,13 @@ import csv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import date
 
 pd.set_option('display.max_columns', 15)
 
+def string_to_date(date_as_str):
+    split_str = date_as_str.split('-')
+    return date(int(split_str[0]), int(split_str[1]), int(split_str[2]))
 
 # helper functions
 def isNumber(val):
@@ -66,10 +70,17 @@ def get_df(water_type, data_type):
     return df, headers_mapping.values()
 
 
-def plot_water(water_type, data_type, start_date, end_date, selected_buildings, ylim=[]):
+def plot_water(water_type, data_type, start_date, end_date, selected_buildings, ylim=[], dynamic_size=False):
     df, buildings = get_df(water_type, data_type)
 
     fig = plt.figure()
+
+    if dynamic_size:
+        # set the width by number of days:
+        d0 = string_to_date(start_date)
+        d1 = string_to_date(end_date)
+        delta = d1 - d0
+        fig.set_figwidth(8 * delta.days)
     ax1 = fig.add_subplot()
 
     # filter by date
@@ -89,6 +100,10 @@ def plot_water(water_type, data_type, start_date, end_date, selected_buildings, 
 
 
 if __name__ == "__main__":
-    plot_water("HW", "GPM", "2021-03-15", "2021-10-05", ['0358_HW.GPM'], ylim=[])
+    plot_water("HW", "GPM", "2021-07-01", "2021-08-01", ['0358_HW.GPM'], ylim=[0, 3], dynamic_size=True)
+
+    #scattered mess:
+    #plot_water("HW", "GPM", "2021-04-12", "2021-04-18", ['0358_HW.GPM'], ylim=[])
+
     # print(get_df("HW", "RET"))
     # df = get_df("CHW", "GPM")['0402_HW.GPM'] # single series
