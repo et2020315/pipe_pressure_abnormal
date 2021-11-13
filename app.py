@@ -41,3 +41,7 @@ def test_cold_pipes():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+#first algorithm flags everything after 3 hours
+# it is showing everything that is outside the bounds
+# it is not bad to flag everything

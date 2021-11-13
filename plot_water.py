@@ -2,13 +2,13 @@
 Temporary python file to analyze data given as csv files.
 '''
 
-
 import csv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
 pd.set_option('display.max_columns', 15)
+
 
 # helper functions
 def isNumber(val):
@@ -64,24 +64,30 @@ def get_df(water_type, data_type):
     return df, headers_mapping.values()
 
 
-def plot_water(water_type, data_type, start_date, end_date):
+def plot_water(water_type, data_type, start_date, end_date, selected_buildings):
     df, buildings = get_df(water_type, data_type)
 
     fig = plt.figure()
     ax1 = fig.add_subplot()
 
-    #filter by date
+    # filter by date
     df = df[(df['new_time'] > start_date) & (df['new_time'] < end_date)]
 
     for building in buildings:
+        if not building in selected_buildings:
+            continue
         # only plots buildings who have data
-        if len(df[building].dropna()):
-            ax1.scatter(df["new_time"], df[building], s=0.7, label=building)
+        try:
+            if len(df[building].dropna()):
+                ax1.scatter(df["new_time"], df[building], s=0.7, label=building)
+        except:
+            print('error')
 
     ax1.legend()
     ax1.figure.show()
 
 
 if __name__ == "__main__":
-    plot_water("CHW", "SUP", "2021-01-01", "2021-01-05")
-    #print(get_df("HW", "RET"))
+    plot_water("CHW", "SUP", "2021-01-01", "2021-05-05", ['0407_CHW.PSP'])
+    # print(get_df("HW", "RET"))
+    # df = get_df("CHW", "GPM")['0402_HW.GPM'] # single series
