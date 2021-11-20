@@ -2,8 +2,7 @@ import json
 
 from flask import Flask
 from flask_cors import CORS
-from arcgis_api import convertToLatLng, UESMapServer
-from testing_data import get_testing_subgraph_polylines
+from arcgis_api import convertToLatLng, UESMapServer, get_polylines_from_request
 from plot_water import get_HDW_for_building
 import os
 
@@ -19,27 +18,15 @@ def hello_world():  # put application's code here
 
 @app.route('/test_pipes')
 def test_pipes():
-    testing_subgraph_polylines = get_testing_subgraph_polylines(MapServerID=UESMapServer.DOMESTIC_HOT_WATER)
-    new_polylines = []
-    for item in testing_subgraph_polylines:
-        new_polylines.append([])
-        for pair in item:
-            coords = convertToLatLng(pair[0], pair[1])
-            new_polylines[len(new_polylines) - 1].append({'lat': coords[0], 'lng': coords[1]})
+    testing_subgraph_polylines = get_polylines_from_request(server_num=UESMapServer.DOMESTIC_HOT_WATER)
 
-    return { 'data': new_polylines}
+    return { 'data': testing_subgraph_polylines}
 
 @app.route('/test_cold_pipes')
 def test_cold_pipes():
-    testing_subgraph_polylines_cold = get_testing_subgraph_polylines(MapServerID=UESMapServer.DOMESTIC_COLD_WATER)
-    new_polylines = []
-    for item in testing_subgraph_polylines_cold:
-        new_polylines.append([])
-        for pair in item:
-            coords = convertToLatLng(pair[0], pair[1])
-            new_polylines[len(new_polylines) - 1].append({'lat': coords[0], 'lng': coords[1]})
+    testing_subgraph_polylines_cold = get_polylines_from_request(server_num=UESMapServer.DOMESTIC_COLD_WATER)
 
-    return { 'data': new_polylines}
+    return { 'data': testing_subgraph_polylines_cold}
 
 @app.route('/get_all_buildings')
 def all_buildings():
