@@ -4,6 +4,8 @@ from flask import Flask
 from flask_cors import CORS
 from arcgis_api import convertToLatLng, UESMapServer
 from testing_data import get_testing_subgraph_polylines
+from plot_water import get_HDW_for_building
+import os
 
 app = Flask(__name__)
 
@@ -38,6 +40,36 @@ def test_cold_pipes():
             new_polylines[len(new_polylines) - 1].append({'lat': coords[0], 'lng': coords[1]})
 
     return { 'data': new_polylines}
+
+@app.route('/get_all_buildings')
+def all_buildings():
+    return { "buildings": [
+        {"name": "KiestHall_Supply"},
+        {"name": "FountainHall_Supply"},
+        {"name": "GainerHall_Supply"},
+        {"name": "LacyHall_Supply"},
+        {"name": "HarrellHall_Supply"},
+        {"name": "WhiteHall_Supply"},
+        {"name": "HarringtonHall_Supply"},
+        {"name": "SpenceHall_Return"},
+        {"name": "BriggsHall_Return"},
+        {"name": "WhitelyHall_Return"},
+        {"name": "HarringtonHall_Return"},
+        {"name": "WellsResidenceHall_Supply"},
+        {"name": "EpprightResidenceHall_Supply"},
+        {"name": "UnderwoodResidenceHall_Supply"},
+        {"name": "DuncanDiningHall_Supply"},
+    ]}
+
+
+@app.route("/get_pressure_data_for/<building>/<time_period>")
+def get_pressure_data_for(building, time_period):
+    return get_HDW_for_building(
+        os.path.join(app.root_path, "data/pressures_domestic_hot.csv"),
+        building,
+        time_period
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True)

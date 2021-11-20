@@ -98,12 +98,41 @@ def plot_water(water_type, data_type, start_date, end_date, selected_buildings, 
     ax1.legend()
     ax1.figure.show()
 
+def get_HDW_for_building(file_dir, building, time_period):
+    df = pd.read_csv(file_dir)
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%m/%d/%Y %H:%M')
+    df.set_index('Timestamp', inplace=True)
+
+    return {
+        "pressure_points": list(df[building].values),
+        "leak_points": False, #list(df[building].values),
+        "time_points": [str(date) for date in df[building].index.values],
+        "has_leak_now": False
+    }
+
 
 if __name__ == "__main__":
-    plot_water("HW", "GPM", "2021-07-01", "2021-08-01", ['0358_HW.GPM'], ylim=[0, 3], dynamic_size=True)
 
-    #scattered mess:
-    #plot_water("HW", "GPM", "2021-04-12", "2021-04-18", ['0358_HW.GPM'], ylim=[])
 
-    # print(get_df("HW", "RET"))
-    # df = get_df("CHW", "GPM")['0402_HW.GPM'] # single series
+     # aparent leak at jan 18
+     # plot_water("HW", "GPM", "2021-01-01", "2021-02-01",
+     #           ['0275_HW.GPM', "0291_HW.GPM"], ylim=[], dynamic_size=True)
+     '''
+         plot_water("HW", "GPM", "2021-01-01", "2021-02-01",
+                    ['0275_HW.GPM', "0291_HW.GPM", "0358_HW.GPM", "0400_HW.GPM",
+                     "0401_HW.GPM", "0402_HW.GPM", "0403_HW.GPM", "0404_HW.GPM"]\
+                    , ylim=[], dynamic_size=True)
+         '''
+
+     get_HDW_for_building(None)
+
+     #'0275_HW.GPM'
+     #scattered mess:
+     # plot_water("HW", "GPM", "2021-04-12", "2021-04-18", ['0358_HW.GPM'], ylim=[])
+
+     # print(get_df("HW", "RET"))
+     # df = get_df("CHW", "GPM")['0402_HW.GPM'] # single series
+
+     # detects actual leak incident #7
+     #plot_water("HW", "GPM", "2021-06-01", "2021-07-01", ['0404_HW.GPM'], ylim=[0, 4], dynamic_size=True)
+     #plot_water("HW", "GPM", "2021-06-01", "2021-07-01", ['0402_HW.GPM', '0404_HW.GPM'], ylim=[], dynamic_size=True)
