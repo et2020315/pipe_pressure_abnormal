@@ -100,13 +100,10 @@ def plot_water(water_type, data_type, start_date, end_date, selected_buildings, 
     ax1.legend()
     ax1.figure.show()
 
-def get_HDW_for_building(file_dir, building, time_period):
-    df = pd.read_csv(file_dir)
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%m/%d/%Y %H:%M')
-    df.set_index('Timestamp', inplace=True)
+def get_HDW_for_building(df_hdw, building, time_period):
     date_start = string_to_date("2021-01-01") + timedelta(days=int(time_period) * TIME_OFFSET)
     date_end = date_start + timedelta(days=TIME_WINDOW)
-    df = df[date_start:date_end]
+    df = df_hdw[date_start:date_end]
     return {
         "pressure_points": list(df[building].values),
         "leak_points": False, #list(df[building].values),
@@ -116,8 +113,6 @@ def get_HDW_for_building(file_dir, building, time_period):
 
 
 if __name__ == "__main__":
-
-
      # aparent leak at jan 18
      # plot_water("HW", "GPM", "2021-01-01", "2021-02-01",
      #           ['0275_HW.GPM', "0291_HW.GPM"], ylim=[], dynamic_size=True)

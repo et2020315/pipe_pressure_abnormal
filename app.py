@@ -5,8 +5,13 @@ from flask_cors import CORS
 from arcgis_api import convertToLatLng, UESMapServer, get_polylines_from_request
 from plot_water import get_HDW_for_building
 import os
+import pandas as pd
 
 app = Flask(__name__)
+
+df_hdw = pd.read_csv(os.path.join(app.root_path, "data/pressures_domestic_hot.csv"))
+df_hdw['Timestamp'] = pd.to_datetime(df_hdw['Timestamp'], format='%m/%d/%Y %H:%M')
+df_hdw.set_index('Timestamp', inplace=True)
 
 CORS(app)
 
@@ -52,7 +57,7 @@ def all_buildings():
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
     return get_HDW_for_building(
-        os.path.join(app.root_path, "data/pressures_domestic_hot.csv"),
+        df_hdw,
         building,
         time_period
     )
