@@ -106,7 +106,7 @@ def get_HDW_for_building(df_hdw, building, time_period):
     df = df_hdw[date_start:date_end]
     return {
         "pressure_points": list(df[building].values),
-        "leak_points": False, #list(df[building].values),
+        "leak_points": [1] * len(df), #this is temporary to work with the front end
         "time_points": [str(date) for date in df[building].index.values],
         "has_leak_now": False
     }
