@@ -6,8 +6,10 @@ import csv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import date
+from datetime import *
 
+TIME_WINDOW = 10
+TIME_OFFSET = 3
 pd.set_option('display.max_columns', 15)
 
 def string_to_date(date_as_str):
@@ -102,7 +104,9 @@ def get_HDW_for_building(file_dir, building, time_period):
     df = pd.read_csv(file_dir)
     df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%m/%d/%Y %H:%M')
     df.set_index('Timestamp', inplace=True)
-
+    date_start = string_to_date("2021-01-01") + timedelta(days=int(time_period) * TIME_OFFSET)
+    date_end = date_start + timedelta(days=TIME_WINDOW)
+    df = df[date_start:date_end]
     return {
         "pressure_points": list(df[building].values),
         "leak_points": False, #list(df[building].values),
