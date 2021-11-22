@@ -16,6 +16,7 @@ import os
 import matplotlib.pyplot as plt
 
 
+# global parameters . set to be constant if all caps, you can change methods by passing it as array
 HIGH_Q = 1
 LOW_Q = 0.06
 AWAY_FROM_MU_LEVEL = 3
@@ -40,10 +41,11 @@ TEST_METHOD = ['quartile']
 
 
 def convert_datetime(dataframe):
+  # convert string to datetime object
   dataframe['Timestamp'] = pd.to_datetime(dataframe['Timestamp'])
+  # you need to set index as time in order for later joining and other precessing
   dataframe = dataframe.set_index('Timestamp')
-  dataframe.head(3)
-  # print(dataframe.index)
+  # this was for joining when timestamp was the same name it will become "unname column", it is just in case forgot to rename timestamp
   try:
     dataframe.drop(columns = ['Unnamed: 0'], inplace=True)
   except:
@@ -52,9 +54,12 @@ def convert_datetime(dataframe):
 
 
 def generate_train_only(chunkNum, dataframe):
+  # validate dataframe before passing into adtk model, this is required.
   dataframe = validate_series(dataframe)
+  # K is a percentage of training data of chunkNum set to 0, SIZE is the total chunk,
   temp = ((1 - K) / SIZE) * chunkNum
   print("temp = " + str(temp))
+  # split at which percentage of total data, from 0 th row to that row will be used as training and testing
   split_at = np.round(K + np.round(temp, decimals= 2), 2)
 
   print("split at = " + str(split_at))
@@ -64,11 +69,12 @@ def generate_train_only(chunkNum, dataframe):
   print(rownum)
   # rownum = ((split_at * len(dataframe)))
   # print("row num = " + str(rownum))
+  # iloc to select
   print(dataframe.iloc[rownum])
   return dataframe.iloc[:rownum, :]
 
 
-
+# use 'time' interpolation to fill the gaps
 def select_and_interpolate(hall_type, dataframe):
   df = dataframe[[hall_type]]
   # print(df.isna().any(axis = 1))
@@ -77,6 +83,7 @@ def select_and_interpolate(hall_type, dataframe):
   return df
 
 
+# choose which detector to use
 def choose_detector(method):
   try:
     # method is a list
@@ -92,14 +99,16 @@ def choose_detector(method):
     traceback.print_exc()
 
 
+# anomaly_df is a true or false dataframe, plot function just plot the graph
 def predict_plot_train(detector, method, train_df):
   detector.fit(train_df)
   anomaly_df = detector.detect(train_df)
-  plot(train_df, anomaly=anomaly_df, anomaly_color="red", anomaly_tag="marker", figsize=FIGSIZE)
-  plt.show()
+  # plot(train_df, anomaly=anomaly_df, anomaly_color="red", anomaly_tag="marker", figsize=FIGSIZE)
+  # plt.show()
   return anomaly_df
 
 
+# this is a overall function that takes care of everythin
 def dhw_validate_and_predict(hall_type, dataframe, method, chunkNum):
   dataframe = convert_datetime(dataframe)
 
@@ -115,46 +124,47 @@ def dhw_validate_and_predict(hall_type, dataframe, method, chunkNum):
     detector = choose_detector(method)
     print('detector type = ' + str(type(detector)))
     anomaly = predict_plot_train(detector, method, train_df)
-    # get actual data
+    # get a dataframe into json list, this data frame contains 3 columns, timestamp, original data and a isAbnormaly column that check whether it is abnormal
     jsonlist = generate_json(train_df, anomaly, hall_type)
-
+    # this produce a table of exact start and end date in each row, and convert it to json
+    # daterange si just t
     exactdates, daterange = getdates(anomaly, hall_type)
     print("returning extact dates, date ranges, jsonlist(all data) for plotting")
     return exactdates, daterange, jsonlist
 
 
 def generate_json(train_df, anomaly, hall_type):
-
   train_df = train_df.reset_index()
   anomaly = anomaly.reset_index()
-  train_df.drop(['Timestamp'],axis = 1, inplace = True)
-  train_df.rename({hall_type : 'original'}, axis = 1, inplace = True)
-  anomaly.rename({hall_type : 'isAbnormal'}, axis = 1, inplace = True)
+  train_df.drop(['Timestamp'], axis=1, inplace=True)
+  train_df.rename({hall_type: 'original'}, axis=1, inplace=True)
+  anomaly.rename({hall_type: 'isAbnormal'}, axis=1, inplace=True)
   temp = train_df.join(anomaly)
   display(temp)
-  jsonlist = []
   counter = len(temp)
-  # print("len = " + str(len(temp)))
-  # print(counter)
+  print("len = " + str(len(temp)))
 
-  for i in range(0,counter):
-    dt = temp.at[i, 'Timestamp'].strftime("%y-%m-%d %H:%M:%S")
-    jsonlist.append({'timestamp': dt, 'original': temp.at[i, 'original'], 'isAbnormal' : temp.at[i, 'isAbnormal']})
-  return jsonlist
+  time_list = [item.strftime("%y-%m-%d %H:%M:%S") for item in temp.loc[:, 'Timestamp']]
+  pressure_list = [item for item in temp.loc[:, 'original']]
+  abnormality_list = [item for item in temp.loc[:, 'isAbnormal']]
+  dict_item = {'timestamp': time_list, 'original': pressure_list, 'abnormality': abnormality_list}
+  return dict_item
+
 
 def datesdf2json(datesdf):
-  jsondates = []
   display(datesdf)
   print("datesdf shape -----------------------")
   print(datesdf.shape)
-  for i in range(datesdf.shape[0]):
-    starttime = datesdf.at[i, 'Timestamp_start']
-    endtime = datesdf.at[i, 'Timestamp_end']
-    jsondates.append({'timestamp_start' : starttime.strftime(EXACT_TIME_FORMAT), 'timestamp_end': endtime.strftime(EXACT_TIME_FORMAT)})
 
+  start_list = [starttime.strftime(EXACT_TIME_FORMAT) for starttime in datesdf.loc[:, 'Timestamp_start']]
+  end_list = [endtime.strftime(EXACT_TIME_FORMAT) for endtime in datesdf.loc[:, 'Timestamp_end']]
+
+  jsondates = {'start': start_list, 'end': end_list}
   print("json exact start and end dates")
   print(jsondates)
   return jsondates
+
+
 
 
 def getdates(anomaly, hall_type):
@@ -179,7 +189,8 @@ def getdates(anomaly, hall_type):
   series = series.dt.date
   curr = series[0];
   next = series[0];
-  lst = []
+  start_lst = []
+  end_lst = []
 
   for i in range(1, len(series)):
     item = series[i] - series[i - 1]
@@ -188,14 +199,18 @@ def getdates(anomaly, hall_type):
     if (item <= days):
       next = series[i]
     else:
-      lst.append({"start": curr.strftime(DATE_FORMAT_OUTPUT), "end": next.strftime(DATE_FORMAT_OUTPUT)})
+      start_lst.append(curr.strftime(DATE_FORMAT_OUTPUT))
+      end_lst.append(next.strftime(DATE_FORMAT_OUTPUT))
       curr = series[i]
       next = series[i]
 
     if (i == len(series) - 1):
-      lst.append({"start": curr.strftime(DATE_FORMAT_OUTPUT), "end": next.strftime(DATE_FORMAT_OUTPUT)})
+      start_lst.append(curr.strftime(DATE_FORMAT_OUTPUT))
+      end_lst.append(next.strftime(DATE_FORMAT_OUTPUT))
+
+  aggregate_range = {'aggregateStart': start_lst, 'aggregateEnd': end_lst}
   print("returning jsondates df -> json, lst , list of json date range")
-  return jsondates, lst
+  return jsondates, aggregate_range
 
 
 def moving_average_method(dataframe, hall_type):
