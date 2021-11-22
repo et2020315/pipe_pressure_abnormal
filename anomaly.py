@@ -132,49 +132,39 @@ def dhw_validate_and_predict(hall_type, dataframe, method, chunkNum):
     print("returning extact dates, date ranges, jsonlist(all data) for plotting")
     return exactdates, daterange, jsonlist
 
+
 def generate_json(train_df, anomaly, hall_type):
   train_df = train_df.reset_index()
   anomaly = anomaly.reset_index()
-  train_df.drop(['Timestamp'],axis = 1, inplace = True)
-  train_df.rename({hall_type : 'original'}, axis = 1, inplace = True)
-  anomaly.rename({hall_type : 'isAbnormal'}, axis = 1, inplace = True)
+  train_df.drop(['Timestamp'], axis=1, inplace=True)
+  train_df.rename({hall_type: 'original'}, axis=1, inplace=True)
+  anomaly.rename({hall_type: 'isAbnormal'}, axis=1, inplace=True)
   temp = train_df.join(anomaly)
   display(temp)
-  time_list = []
-  pressure_list = []
-  abnormality_list = []
   counter = len(temp)
   print("len = " + str(len(temp)))
-  print(counter)
-  for i in range(0,counter):
-    dt = temp.at[i, 'Timestamp'].strftime("%y-%m-%d %H:%M:%S")
-    time_list.append(dt)
-    pressure_list.append(temp.at[i, 'original'])
-    abnormality_list.append(temp.at[i, 'isAbnormal'])
-  dict_item = {'timestamp' : time_list, 'original' : pressure_list, 'abnormality': abnormality_list}
+
+  time_list = [item.strftime("%y-%m-%d %H:%M:%S") for item in temp.loc[:, 'Timestamp']]
+  pressure_list = [item for item in temp.loc[:, 'original']]
+  abnormality_list = [item for item in temp.loc[:, 'isAbnormal']]
+  dict_item = {'timestamp': time_list, 'original': pressure_list, 'abnormality': abnormality_list}
   return dict_item
 
 
 def datesdf2json(datesdf):
-  jsondates = {}
   display(datesdf)
   print("datesdf shape -----------------------")
   print(datesdf.shape)
-  start_list = []
-  end_list = []
 
-  for i in range(datesdf.shape[0]):
-    starttime = datesdf.at[i, 'Timestamp_start']
-    starttime = starttime.strftime(EXACT_TIME_FORMAT)
-    endtime = datesdf.at[i, 'Timestamp_end']
-    endtime = endtime.strftime(EXACT_TIME_FORMAT)
-    start_list.append(starttime)
-    end_list.append(endtime)
+  start_list = [starttime.strftime(EXACT_TIME_FORMAT) for starttime in datesdf.loc[:, 'Timestamp_start']]
+  end_list = [endtime.strftime(EXACT_TIME_FORMAT) for endtime in datesdf.loc[:, 'Timestamp_end']]
 
   jsondates = {'start': start_list, 'end': end_list}
   print("json exact start and end dates")
   print(jsondates)
   return jsondates
+
+
 
 
 def getdates(anomaly, hall_type):
