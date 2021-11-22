@@ -10,6 +10,7 @@ UES_API_URL = "https://ues-arc.tamu.edu/arcgis/rest/services" + "/Yoho/UES_Opera
 TAMU_BASEMAP_API_URL = "https://gis.tamu.edu/arcgis/rest/services/FCOR/TAMU_BaseMap/MapServer/"
 POST_FIX = "/query?"
 transformer = Transformer.from_crs('epsg:32139', 'epsg:4326')
+transformer2 = Transformer.from_crs('epsg:102100', 'epsg:4326')
 
 
 # arcgis map servers
@@ -30,8 +31,11 @@ class TAMUBaseMapServer(Enum):
     NON_UNIV_BUILDING = 7
 
 
-def convertToLatLng(x1, y1):
-    x2, y2 = transformer.transform(x1, y1)
+def convertToLatLng(x1, y1, conversiontype=0):
+    if conversiontype == 0:
+        x2, y2 = transformer.transform(x1, y1)
+    elif conversiontype == 1:
+        x2, y2 = transformer2.transform(x1, y1)
 
     return x2, y2
 
@@ -57,7 +61,7 @@ def arcgis_api_request(base_api_url, server_num, query={}, printurl = False):
 # it returns a json
 def unlimited_arcgis_api_request_json(base_api_url=UES_API_URL,
                                       server_num=UESMapServer.DOMESTIC_COLD_WATER,
-                                      query={"where": "1=1"}, printurl = False):
+                                      query={"where": "1=1"}, printurl = True):
     # ask the server directly for the number of objects in the request
     count = int(arcgis_api_request(
         base_api_url, server_num, query=merge_dicts(query, {"returnCountOnly": "true"}), printurl=printurl
@@ -100,6 +104,22 @@ def get_polylines_from_request(base_api_url=UES_API_URL,
 
     return polylines
 
+def get_polygons_from_request(base_api_url=TAMU_BASEMAP_API_URL,
+                              server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000,
+                              query={"text": "Hall", "outFields": "objectid"}):
+    request_json = unlimited_arcgis_api_request_json(
+        base_api_url, server_num, query=query
+    )
+    polygons = []
+    for group in request_json["features"]:
+        if "geometry" in group and len(group["geometry"]["rings"]):
+            vertex_data = group["geometry"]["rings"][0]
+            polygons.append([])
+            for vertex in vertex_data:
+                coords = convertToLatLng(vertex[0], vertex[1], conversiontype=1)
+                polygons[len(polygons) - 1].append({'lat': coords[0], 'lng': coords[1], 'id': group["attributes"]['OBJECTID']})
+
+    return polygons
 
 if __name__ == "__main__":
     #**********example usages

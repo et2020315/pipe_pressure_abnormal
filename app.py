@@ -5,7 +5,7 @@ from flask_cors import CORS
 from arcgis_api import convertToLatLng, UESMapServer
 from flask import request
 from plot_water import get_df
-from arcgis_api import convertToLatLng, UESMapServer, get_polylines_from_request
+from arcgis_api import convertToLatLng, UESMapServer, get_polylines_from_request, TAMUBaseMapServer, TAMU_BASEMAP_API_URL, get_polygons_from_request
 from plot_water import get_HDW_for_building
 import os
 import pandas as pd
@@ -33,6 +33,13 @@ def test_pipes():
 @app.route('/test_cold_pipes')
 def test_cold_pipes():
     testing_subgraph_polylines_cold = get_polylines_from_request(server_num=UESMapServer.DOMESTIC_COLD_WATER)
+
+    return { 'data': testing_subgraph_polylines_cold}
+@app.route('/test_buildings')
+def test_building():
+    testing_subgraph_polylines_buildings = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
+
+    return {'data': testing_subgraph_polylines_buildings}
 
 @app.route('/test_data/<general_type>/<subtype>/<building_num>/', methods=['Get'])
 def test_data(general_type, subtype, building_num):
