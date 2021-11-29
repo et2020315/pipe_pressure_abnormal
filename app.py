@@ -9,12 +9,15 @@ from arcgis_api import convertToLatLng, UESMapServer, get_polylines_from_request
 from plot_water import get_HDW_for_building
 import os
 import pandas as pd
+from anomaly import dhw_validate_and_predict
 
 app = Flask(__name__)
 
 df_hdw = pd.read_csv(os.path.join(app.root_path, "data/pressures_domestic_hot.csv"))
 df_hdw['Timestamp'] = pd.to_datetime(df_hdw['Timestamp'], format='%m/%d/%Y %H:%M')
 df_hdw.set_index('Timestamp', inplace=True)
+
+df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
 
 CORS(app)
 
@@ -81,12 +84,9 @@ def all_buildings():
 
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
-    return get_HDW_for_building(
-        df_hdw,
-        building,
-        time_period
-    )
 
+    data = dhw_validate_and_predict(building, df, ['seasonal'], int(time_period), 50)
+    return data
 
 if __name__ == '__main__':
     app.run(debug=True)

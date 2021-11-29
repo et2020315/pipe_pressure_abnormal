@@ -148,7 +148,7 @@ def generate_json(train_df, anomaly, hall_type):
     last_day_has_leak_df = temp.loc[:, 'isAbnormal'].iloc[-24: -1]
     print("--------------------------")
     print(last_day_has_leak_df)
-    dict_item = {'timestamp' : time_list, 'original' : pressure_list, 'abnormality': abnormality_list, 'last_day_has_leak': len(last_day_has_leak_df[last_day_has_leak_df]) >= 1}
+    dict_item = {'time_points' : time_list, 'pressure_points' : pressure_list, 'leak_points': abnormality_list, 'last_day_has_leak': len(last_day_has_leak_df[last_day_has_leak_df]) >= 1}
     return dict_item
   except:
     traceback.print_exc()
