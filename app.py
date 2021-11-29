@@ -38,8 +38,82 @@ def test_cold_pipes():
 @app.route('/test_buildings')
 def test_building():
     testing_subgraph_polylines_buildings = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
-
     return {'data': testing_subgraph_polylines_buildings}
+
+@app.route('/test_affected_buildings')
+def test_affected_buildings():
+    testing_subgraph_polylines_affected_buildings = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "57, 78, 70, 308, 59, 978, 981, 56, 65, 980, 660, 677, 66, 688", "outFields" : "objectid"})
+    return {'data': testing_subgraph_polylines_affected_buildings}
+
+@app.route('/test_affected_kiest')
+def test_affected_kiest():
+    testing_subgraph_affected_kiest = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "57", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_kiest}
+
+@app.route('/test_affected_fountain')
+def test_affected_fountain():
+    testing_subgraph_affected_fountain = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "78", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_fountain}
+
+@app.route('/test_affected_gainer')
+def test_affected_gainer():
+    testing_subgraph_affected_gainer = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "70", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_gainer}
+
+@app.route('/test_affected_lacy')
+def test_affected_lacy():
+    testing_subgraph_affected_lacy = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "308", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_lacy}
+
+@app.route('/test_affected_harrell')
+def test_affected_harrell():
+    testing_subgraph_affected_harrell = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "59", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_harrell}
+
+@app.route('/test_affected_white')
+def test_affected_white():
+    testing_subgraph_affected_white = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "978", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_white}
+
+@app.route('/test_affected_harrington')
+def test_affected_harrington():
+    testing_subgraph_affected_harrington = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "981", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_harrington}
+
+@app.route('/test_affected_spence')
+def test_affected_spence():
+    testing_subgraph_affected_spence = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "56", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_spence}
+
+@app.route('/test_affected_briggs')
+def test_affected_briggs():
+    testing_subgraph_affected_briggs = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "65", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_briggs}
+
+@app.route('/test_affected_whiteley')
+def test_affected_whiteley():
+    testing_subgraph_affected_whiteley = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "980", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_whiteley}
+
+@app.route('/test_affected_wells')
+def test_affected_wells():
+    testing_subgraph_affected_wells = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "660", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_wells}
+
+@app.route('/test_affected_eppright')
+def test_affected_eppright():
+    testing_subgraph_affected_eppright = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "677", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_eppright}
+
+@app.route('/test_affected_underwood')
+def test_affected_underwood():
+    testing_subgraph_affected_underwood = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "66", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_underwood}
+
+@app.route('/test_affected_duncan')
+def test_affected_duncan():
+    testing_subgraph_affected_duncan = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "688", "outFields" : "objectid"})
+    return {'data' : testing_subgraph_affected_duncan}
 
 @app.route('/test_data/<general_type>/<subtype>/<building_num>/', methods=['Get'])
 def test_data(general_type, subtype, building_num):
