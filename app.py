@@ -18,6 +18,8 @@ df_hdw['Timestamp'] = pd.to_datetime(df_hdw['Timestamp'], format='%m/%d/%Y %H:%M
 df_hdw.set_index('Timestamp', inplace=True)
 
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
+SELECTED_DAY = 0
+STARTING_TRAINING_DAYS = 50
 
 CORS(app)
 
@@ -158,9 +160,19 @@ def all_buildings():
 
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
-
-    data = dhw_validate_and_predict(building, df, ['seasonal'], int(time_period), 50)
+    data = dhw_validate_and_predict(building, df, ['iqr'], SELECTED_DAY, STARTING_TRAINING_DAYS)
     return data
+
+@app.route("/set_selected_day/<selected_day>")
+def set_selected_day(selected_day):
+    global SELECTED_DAY
+    SELECTED_DAY = int(selected_day)
+    return {"data": {"updated_correctly": True}}
+
+@app.route("/get_time_period")
+def get_time_period():
+    data = dhw_validate_and_predict("KiestHall_Supply", df, ['iqr'], SELECTED_DAY, STARTING_TRAINING_DAYS)
+    return {'data': { 'start_date': data['time_points'][-24], 'end_date' : data['time_points'][-1] } }
 
 if __name__ == '__main__':
     app.run(debug=True)

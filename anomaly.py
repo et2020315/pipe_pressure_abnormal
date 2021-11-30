@@ -65,7 +65,7 @@ def generate_train_only(day_num, num_of_training_days,dataframe):
   if (curr_records >= len(dataframe)):
     print("return none")
     return None
-  print(dataframe.iloc[: (starting_days + day_num * 24)])
+  #print(dataframe.iloc[: (starting_days + day_num * 24)])
   return (dataframe.iloc[: (starting_days + day_num * 24)])
 
 
@@ -127,27 +127,21 @@ def generate_json(train_df, anomaly, hall_type):
   try:
     train_df = train_df.reset_index()
     anomaly = anomaly.reset_index()
-    print("*********************1")
     train_df.drop(['Timestamp'],axis = 1, inplace = True)
     train_df.rename({hall_type : 'original'}, axis = 1, inplace = True)
     anomaly.rename({hall_type : 'isAbnormal'}, axis = 1, inplace = True)
-    print("*********************2")
     temp = train_df.join(anomaly)
     display(temp)
-    print("*********************3")
     time_list = []
     pressure_list = []
     abnormality_list = []
     counter = len(temp)
-    print("len = " + str(len(temp)))
-    print("*********************4")
+    #print("len = " + str(len(temp)))
     time_list = [item.strftime("%y-%m-%d %H:%M:%S") for item in temp.loc[:, 'Timestamp']]
     pressure_list = [item for item in temp.loc[: , 'original']]
     abnormality_list = [item for item in temp.loc[:, 'isAbnormal']]
-    print("*********************8")
     last_day_has_leak_df = temp.loc[:, 'isAbnormal'].iloc[-24: -1]
-    print("--------------------------")
-    print(last_day_has_leak_df)
+    #print(last_day_has_leak_df)
     dict_item = {'time_points' : time_list, 'pressure_points' : pressure_list, 'leak_points': abnormality_list, 'last_day_has_leak': len(last_day_has_leak_df[last_day_has_leak_df]) >= 1}
     return dict_item
   except:
