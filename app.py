@@ -173,6 +173,11 @@ def set_selected_day(selected_day):
     SELECTED_DAY = int(selected_day)
     return {"data": {"updated_correctly": True}}
 
+@app.route("/get_building_map_data_for/<building>/<time_period>")
+def get_building_map_data_for(building, time_period):
+    data = dhw_validate_and_predict(building, df, ['quartile'], SELECTED_DAY, STARTING_TRAINING_DAYS)
+    return data
+
 @app.route("/get_time_period")
 def get_time_period():
     data = dhw_validate_and_predict("KiestHall_Supply", df, ['iqr'], SELECTED_DAY, STARTING_TRAINING_DAYS)
