@@ -131,7 +131,7 @@ def generate_json(train_df, anomaly, hall_type):
     train_df.rename({hall_type : 'original'}, axis = 1, inplace = True)
     anomaly.rename({hall_type : 'isAbnormal'}, axis = 1, inplace = True)
     temp = train_df.join(anomaly)
-    #display(temp)
+    display(temp)
     time_list = []
     pressure_list = []
     abnormality_list = []
@@ -139,8 +139,16 @@ def generate_json(train_df, anomaly, hall_type):
     #print("len = " + str(len(temp)))
     time_list = [item.strftime("%y-%m-%d %H:%M:%S") for item in temp.loc[:, 'Timestamp']]
     pressure_list = [item for item in temp.loc[: , 'original']]
+
+    # remove single hour false positive
+    modified = modified_anomaly(3, temp['isAbnormal'])
+    temp['isAbnormal'] = modified
+
     abnormality_list = [item for item in temp.loc[:, 'isAbnormal']]
     last_day_has_leak_df = temp.loc[:, 'isAbnormal'].iloc[-24: -1]
+
+
+
     #print(last_day_has_leak_df)
     dict_item = {'time_points' : time_list, 'pressure_points' : pressure_list, 'leak_points': abnormality_list, 'last_day_has_leak': len(last_day_has_leak_df[last_day_has_leak_df]) >= 1}
     return dict_item

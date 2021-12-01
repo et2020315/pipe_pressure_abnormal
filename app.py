@@ -161,9 +161,7 @@ def all_buildings():
 
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
-    data = dhw_validate_and_predict(building, df, ['seasonal'], int(time_period), 50)
-    modified = modified_anomaly(5, data['leak_points'])
-    data['leak_points'] = modified
+    data = dhw_validate_and_predict(building, df, ['seasonal'], SELECTED_DAY, 50)
     print(data)
     return data
 
