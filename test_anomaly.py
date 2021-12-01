@@ -35,7 +35,7 @@ def test_method_false_positive(method, day_nums):
     count_days_true_negative = 0
     #assert test_method_precision(['iqr'], [119]) == 1.0
     for day in range(1, 100):
-        our_algorithm_detects_abnormality = test_method_precision(method, [day]) ==1.0
+        our_algorithm_detects_abnormality = test_method_precision(method, [day]) == 1.0
         there_is_actual_leak = day in day_nums
         if (our_algorithm_detects_abnormality and there_is_actual_leak):
             count_days_true_positive += 1
@@ -50,9 +50,9 @@ def test_method_false_positive(method, day_nums):
     print("false positive = " + str(count_days_false_positive))
     print(" false negative = " + str(count_days_false_negative))
     print("true negative = " + str(count_days_true_negative))
-    return (count_days_false_positive + count_days_false_negative) / (100)
+    return (count_days_false_positive + count_days_false_negative) /(count_days_false_positive + count_days_false_negative + count_days_true_positive + count_days_true_negative )
 
-def test():
+def error_rate():
     assert test_method_false_positive(['iqr'], actual_pipeleak_days) == 1.0
 
 #check if precisions are 100%

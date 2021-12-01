@@ -141,15 +141,15 @@ def generate_json(train_df, anomaly, hall_type):
     pressure_list = [item for item in temp.loc[: , 'original']]
 
     # remove single hour false positive
-    modified = modified_anomaly(3, temp['isAbnormal'])
-    print("modified length = " + str(len(modified)))
-    print("original length = " + str(len(temp['isAbnormal'])))
-
-    if (len(modified) == 0):
-      print("empty length ")
-      print("length of original = " + len(temp['isAbnormal']))
-      return {}
-    temp['isAbnormal'] = modified
+    # modified = modified_anomaly(3, temp['isAbnormal'])
+    # print("modified length = " + str(len(modified)))
+    # print("original length = " + str(len(temp['isAbnormal'])))
+    #
+    # if (len(modified) == 0):
+    #   print("empty length ")
+    #   print("length of original = " + len(temp['isAbnormal']))
+    #   return {}
+    # temp['isAbnormal'] = modified
 
     abnormality_list = [item for item in temp.loc[:, 'isAbnormal']]
     last_day_has_leak_df = temp.loc[:, 'isAbnormal'].iloc[-24: -1]
