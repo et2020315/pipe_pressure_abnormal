@@ -131,7 +131,7 @@ def generate_json(train_df, anomaly, hall_type):
     train_df.rename({hall_type : 'original'}, axis = 1, inplace = True)
     anomaly.rename({hall_type : 'isAbnormal'}, axis = 1, inplace = True)
     temp = train_df.join(anomaly)
-    display(temp)
+    # display(temp)
     time_list = []
     pressure_list = []
     abnormality_list = []
@@ -142,6 +142,13 @@ def generate_json(train_df, anomaly, hall_type):
 
     # remove single hour false positive
     modified = modified_anomaly(3, temp['isAbnormal'])
+    print("modified length = " + str(len(modified)))
+    print("original length = " + str(len(temp['isAbnormal'])))
+
+    if (len(modified) == 0):
+      print("empty length ")
+      print("length of original = " + len(temp['isAbnormal']))
+      return {}
     temp['isAbnormal'] = modified
 
     abnormality_list = [item for item in temp.loc[:, 'isAbnormal']]
@@ -179,8 +186,8 @@ def modified_anomaly(NUM, tf):
       counter += 1
       counts.append(counter)
     # print(str(tf[i]) + " " + str(counts[i]))
-  print("ori")
-  print(counts)
+  #print("ori")
+  #print(counts)
   # reversed = counts[::-1]
   # print("revserse")
   # print(reversed)
@@ -190,15 +197,19 @@ def modified_anomaly(NUM, tf):
   while (counter2 >= 0):
     if (counter2 >= 0 and (counts[counter2] >= NUM)):
       while (counts[counter2] > 0):
-        print("display = " + str(counts[counter2]) + " " + "actual = true, counter2 = " + str(counter2))
+        # print("display = " + str(counts[counter2]) + " " + "actual = true, counter2 = " + str(counter2))
         modified.append(True)
         counter2 -= 1
 
     if (counter2 >= 0):
-      print("display = " + str(counts[counter2]) + " " + "actual = false, counter2 = " + str(counter2))
+      # print("display = " + str(counts[counter2]) + " " + "actual = false, counter2 = " + str(counter2))
       modified.append(False)
       counter2 -= 1
   modified2 = modified[::-1]
+  print("\n")
+  print("len tf series = " + str(len(tf)))
+  print("len count = " + str(len(counts)))
+  print("len modified = " + str(len(modified)))
   return modified2
 
 
