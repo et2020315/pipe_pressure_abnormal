@@ -161,19 +161,13 @@ def all_buildings():
 
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
-    data = dhw_validate_and_predict(building, df, ['seasonal'], SELECTED_DAY, 50)
+    data = dhw_validate_and_predict(building, df, ['seasonal'], int(time_period), 50)
     print(data)
     return data
 
-@app.route("/set_selected_day/<selected_day>")
-def set_selected_day(selected_day):
-    global SELECTED_DAY
-    SELECTED_DAY = int(selected_day)
-    return {"data": {"updated_correctly": True}}
-
 @app.route("/get_building_map_data_for/<building>/<time_period>")
 def get_building_map_data_for(building, time_period):
-    data = dhw_validate_and_predict(building, df, ['quartile'], SELECTED_DAY, STARTING_TRAINING_DAYS)
+    data = dhw_validate_and_predict(building, df, ['quartile'], int(time_period), STARTING_TRAINING_DAYS)
     return data
 
 @app.route("/get_time_period")
