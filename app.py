@@ -10,6 +10,7 @@ from plot_water import get_HDW_for_building
 import os
 import pandas as pd
 from anomaly import dhw_validate_and_predict
+from anomaly import modified_anomaly
 
 app = Flask(__name__)
 
@@ -160,7 +161,10 @@ def all_buildings():
 
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
-    data = dhw_validate_and_predict(building, df, ['quartile'], SELECTED_DAY, STARTING_TRAINING_DAYS)
+    data = dhw_validate_and_predict(building, df, ['seasonal'], int(time_period), 50)
+    modified = modified_anomaly(5, data['leak_points'])
+    data['leak_points'] = modified
+    print(data)
     return data
 
 @app.route("/set_selected_day/<selected_day>")

@@ -160,7 +160,38 @@ def generate_json(train_df, anomaly, hall_type):
 #   print(jsondates)
 #   return jsondates
 
+def modified_anomaly(NUM, tf):
+  counts = []
+  counter = 0
+  for i in range(len(tf)):
+    if tf[i] == False:
+      counter = 0
+      counts.append(0)
+    else:
+      counter += 1
+      counts.append(counter)
+    # print(str(tf[i]) + " " + str(counts[i]))
+  print("ori")
+  print(counts)
+  # reversed = counts[::-1]
+  # print("revserse")
+  # print(reversed)
+  modified = []
+  counter2 = len(counts) - 1
 
+  while (counter2 >= 0):
+    if (counter2 >= 0 and (counts[counter2] >= NUM)):
+      while (counts[counter2] > 0):
+        print("display = " + str(counts[counter2]) + " " + "actual = true, counter2 = " + str(counter2))
+        modified.append(True)
+        counter2 -= 1
+
+    if (counter2 >= 0):
+      print("display = " + str(counts[counter2]) + " " + "actual = false, counter2 = " + str(counter2))
+      modified.append(False)
+      counter2 -= 1
+  modified2 = modified[::-1]
+  return modified2
 
 
 # def getdates(anomaly, hall_type):
