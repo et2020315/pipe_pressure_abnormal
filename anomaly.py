@@ -131,7 +131,7 @@ def generate_json(train_df, anomaly, hall_type):
     train_df.rename({hall_type : 'original'}, axis = 1, inplace = True)
     anomaly.rename({hall_type : 'isAbnormal'}, axis = 1, inplace = True)
     temp = train_df.join(anomaly)
-    display(temp)
+    #display(temp)
     time_list = []
     pressure_list = []
     abnormality_list = []

@@ -160,7 +160,7 @@ def all_buildings():
 
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
-    data = dhw_validate_and_predict(building, df, ['iqr'], SELECTED_DAY, STARTING_TRAINING_DAYS)
+    data = dhw_validate_and_predict(building, df, ['quartile'], SELECTED_DAY, STARTING_TRAINING_DAYS)
     return data
 
 @app.route("/set_selected_day/<selected_day>")
