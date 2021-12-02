@@ -5,3 +5,7 @@ gunicorn
 path
 pyproj
 ipython
+numpy
+sklearn
+pandas
+matplotlib
