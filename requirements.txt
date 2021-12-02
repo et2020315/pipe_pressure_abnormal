@@ -1,5 +1,4 @@
 adtk
-anaconda-navigator
 anaconda-project
 argh
 asn1crypto
