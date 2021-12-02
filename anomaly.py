@@ -60,17 +60,9 @@ def convert_datetime(dataframe):
 
 
 
-def generate_train_only(day_num, num_of_training_days,dataframe):
+def generate_train_only(date, dataframe):
   dataframe = validate_series(dataframe)
-  starting_days = num_of_training_days * 24 # k
-  # max_day_num = int(math.floor(len(dataframe) / 24))
-  # print(max_day_num)
-  curr_records = starting_days + day_num * 24
-  if (curr_records >= len(dataframe)):
-    print("return none")
-    return None
-  #print(dataframe.iloc[: (starting_days + day_num * 24)])
-  return (dataframe.iloc[: (starting_days + day_num * 24)])
+  return dataframe[:date]
 
 
 
@@ -114,11 +106,11 @@ def predict_plot_train(detector, method, train_df):
   return anomaly_df
 
 
-def dhw_validate_and_predict(hall_type, dataframe, method, dayNum, num_of_training_days):
+def dhw_validate_and_predict(hall_type, dataframe, method, date):
   dataframe = convert_datetime(dataframe)
 
   dataframe = select_and_interpolate(hall_type, dataframe)
-  train_df = generate_train_only(dayNum, num_of_training_days, dataframe)
+  train_df = generate_train_only(date, dataframe)
 
   detector = choose_detector(method)
   anomaly = predict_plot_train(detector, method, train_df)
@@ -261,7 +253,7 @@ def moving_average_method(dataframe, hall_type):
 
 if __name__ == "__main__":
   df = pd.read_csv("data/finalDHW.csv")
-  data = dhw_validate_and_predict(SELECT_COLUMN, df, TEST_METHOD, 10, 80)
+  data = dhw_validate_and_predict(SELECT_COLUMN, df, TEST_METHOD, "10-10-2020")
 
 
 

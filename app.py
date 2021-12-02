@@ -15,8 +15,6 @@ from anomaly import modified_anomaly
 app = Flask(__name__)
 
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
-SELECTED_DAY = 0
-STARTING_TRAINING_DAYS = 50
 
 CORS(app)
 
@@ -155,14 +153,16 @@ def all_buildings():
     ]}
 
 
-@app.route("/get_pressure_data_for/<building>/<time_period>")
-def get_pressure_data_for(building, time_period):
-    data = dhw_validate_and_predict(building, df, ['seasonal'], int(time_period), 50)
+@app.route("/get_pressure_data_for/<building>")
+def get_pressure_data_for(building):
+    time_cutoff_left = request.args.get('time_cutoff_left')
+    data = dhw_validate_and_predict(building, df, ['seasonal'], time_cutoff_left)
     return data
 
-@app.route("/get_building_map_data_for/<building>/<time_period>")
-def get_building_map_data_for(building, time_period):
-    data = dhw_validate_and_predict(building, df, ['quartile'], int(time_period), STARTING_TRAINING_DAYS)
+@app.route("/get_building_map_data_for/<building>")
+def get_building_map_data_for(building):
+    time_cutoff_left = request.args.get('time_cutoff_left')
+    data = dhw_validate_and_predict(building, df, ['quartile'], time_cutoff_left)
     return data
 
 if __name__ == '__main__':
