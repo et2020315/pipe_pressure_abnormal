@@ -1,20 +1,12 @@
 
 from adtk.data import validate_series
-from adtk.visualization import plot
-from IPython.display import display
-from sklearn.model_selection import train_test_split
 from adtk.detector import SeasonalAD
 from adtk.detector import LevelShiftAD
 from adtk.detector import QuantileAD
 from adtk.detector import InterQuartileRangeAD
 
 import pandas as pd
-import numpy as np
-import json
 import traceback
-import os
-import matplotlib.pyplot as plt
-
 
 # global parameters . set to be constant if all caps, you can change methods by passing it as array
 #**** Quartile method
