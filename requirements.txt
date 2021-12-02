@@ -1,4 +1,6 @@
 adtk
+anaconda-navigator
+anaconda-project
 argh
 asn1crypto
 astropy
@@ -12,6 +14,7 @@ bottleneck
 brotlipy
 comtypes
 conda-build
+conda-package-handling
 conda-repo-cli
 conda-token
 conda-verify
@@ -28,7 +31,6 @@ gunicorn
 h5py
 html5lib
 imagecodecs
-importlib-metadata
 jdcal
 jupyter
 jupyterlab
@@ -39,6 +41,7 @@ mkl-service
 mock
 more-itertools
 multipledispatch
+munkres
 mypy-extensions
 navigator-updater
 nltk
@@ -53,14 +56,15 @@ pip-chill
 ply
 pycurl
 pydocstyle
+pyjwt
 pyodbc
 pyopenssl
 pyproj
 pyreadline
 pytest
 rope
-rtree
 scikit-image
+scikit-learn-intelex
 seaborn
 simplegeneric
 singledispatch
@@ -71,7 +75,10 @@ spyder
 sqlalchemy
 sympy
 tables
+tbb
 unicodecsv
+unidecode
+whichcraft
 win-inet-pton
 win-unicode-console
 wincertstore
