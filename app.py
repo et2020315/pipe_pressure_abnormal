@@ -156,13 +156,15 @@ def all_buildings():
 @app.route("/get_pressure_data_for/<building>")
 def get_pressure_data_for(building):
     time_cutoff_left = request.args.get('time_cutoff_left')
-    data = dhw_validate_and_predict(building, df, ['seasonal'], time_cutoff_left)
+    detection_method = request.args.get('detection_method')
+    data = dhw_validate_and_predict(building, df, [detection_method], time_cutoff_left)
     return data
 
 @app.route("/get_building_map_data_for/<building>")
 def get_building_map_data_for(building):
     time_cutoff_left = request.args.get('time_cutoff_left')
-    data = dhw_validate_and_predict(building, df, ['quartile'], time_cutoff_left)
+    detection_method = request.args.get('detection_method')
+    data = dhw_validate_and_predict(building, df, [detection_method], time_cutoff_left)
     return data
 
 if __name__ == '__main__':
