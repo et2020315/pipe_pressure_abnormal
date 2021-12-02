@@ -4,7 +4,6 @@ from adtk.detector import SeasonalAD
 from adtk.detector import LevelShiftAD
 from adtk.detector import QuantileAD
 from adtk.detector import InterQuartileRangeAD
-
 import pandas as pd
 import traceback
 
