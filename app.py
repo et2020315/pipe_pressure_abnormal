@@ -14,10 +14,6 @@ from anomaly import modified_anomaly
 
 app = Flask(__name__)
 
-df_hdw = pd.read_csv(os.path.join(app.root_path, "data/pressures_domestic_hot.csv"))
-df_hdw['Timestamp'] = pd.to_datetime(df_hdw['Timestamp'], format='%m/%d/%Y %H:%M')
-df_hdw.set_index('Timestamp', inplace=True)
-
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
 SELECTED_DAY = 0
 STARTING_TRAINING_DAYS = 50
@@ -162,7 +158,6 @@ def all_buildings():
 @app.route("/get_pressure_data_for/<building>/<time_period>")
 def get_pressure_data_for(building, time_period):
     data = dhw_validate_and_predict(building, df, ['seasonal'], int(time_period), 50)
-    print(data)
     return data
 
 @app.route("/get_building_map_data_for/<building>/<time_period>")

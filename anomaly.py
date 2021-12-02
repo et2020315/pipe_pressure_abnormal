@@ -136,32 +136,25 @@ def generate_json(train_df, anomaly, hall_type):
     anomaly.rename({hall_type : 'isAbnormal'}, axis = 1, inplace = True)
     temp = train_df.join(anomaly)
     # display(temp)
-    time_list = []
-    pressure_list = []
-    abnormality_list = []
-    counter = len(temp)
     #print("len = " + str(len(temp)))
     time_list = [item.strftime("%y-%m-%d %H:%M:%S") for item in temp.loc[:, 'Timestamp']]
-    pressure_list = [item for item in temp.loc[: , 'original']]
 
     # remove single hour false positive
     # modified = modified_anomaly(3, temp['isAbnormal'])
-    # print("modified length = " + str(len(modified)))
-    # print("original length = " + str(len(temp['isAbnormal'])))
-    #
     # if (len(modified) == 0):
     #   print("empty length ")
     #   print("length of original = " + len(temp['isAbnormal']))
     #   return {}
     # temp['isAbnormal'] = modified
 
-    abnormality_list = [item for item in temp.loc[:, 'isAbnormal']]
+    abnormality_list = [item for item in temp['isAbnormal']]
     last_day_has_leak_df = temp.loc[:, 'isAbnormal'].iloc[-24: -1]
 
 
-
-    #print(last_day_has_leak_df)
-    dict_item = {'time_points' : time_list, 'pressure_points' : pressure_list, 'leak_points': abnormality_list, 'last_day_has_leak': len(last_day_has_leak_df[last_day_has_leak_df]) >= 1}
+    dict_item = {'time_points' : time_list,
+                 'pressure_points' : list(temp['original'].values),
+                 'leak_points': abnormality_list,
+                 'last_day_has_leak': len(last_day_has_leak_df[last_day_has_leak_df]) >= 1 }
     return dict_item
   except:
     traceback.print_exc()
