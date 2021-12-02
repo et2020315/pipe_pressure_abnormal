@@ -1,8 +1,8 @@
 adtk==0.6.2
 alabaster==0.7.12
 anaconda-client
-anaconda-navigator==2.0.3
-anaconda-project==0.9.1
+anaconda-navigator
+anaconda-project
 anyio==2.2.0
 appdirs==1.4.4
 argh==0.26.2
