@@ -27,7 +27,7 @@ CORS(app)
 @app.route('/')
 def hello_world():  # put application's code here
     return {
-        'name' : ["item1", "item2"]
+        'name' : "Welcome to pipe-leak's API!"
     }
 
 @app.route('/test_pipes')
@@ -169,11 +169,6 @@ def get_pressure_data_for(building, time_period):
 def get_building_map_data_for(building, time_period):
     data = dhw_validate_and_predict(building, df, ['quartile'], int(time_period), STARTING_TRAINING_DAYS)
     return data
-
-@app.route("/get_time_period")
-def get_time_period():
-    data = dhw_validate_and_predict("KiestHall_Supply", df, ['iqr'], SELECTED_DAY, STARTING_TRAINING_DAYS)
-    return {'data': { 'start_date': data['time_points'][-24], 'end_date' : data['time_points'][-1] } }
 
 if __name__ == '__main__':
     app.run(debug=True)
