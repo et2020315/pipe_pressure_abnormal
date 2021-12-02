@@ -17,21 +17,25 @@ import matplotlib.pyplot as plt
 
 
 # global parameters . set to be constant if all caps, you can change methods by passing it as array
+#**** Quartile method
 HIGH_Q = 1
-LOW_Q = 0.06
+LOW_Q = 0.10
+#**** level method
 AWAY_FROM_MU_LEVEL = 3
 WINSIZE_LEVEL = 7
+#**** moving average method
 WINDOW_AVG = 7
 AWAY_FROM_MU = 2
 SIZE = 10
 WINDOW = 7
+#**** Seasonal Method
 WINDOW_SEASON = 8
+#**** Constants
 FIGSIZE = (200,60)
 EXACT_TIME_FORMAT = "%y-%m-%d %H:%M:%S"
 DATE_FORMAT_OUTPUT = "%Y-%m-%d"
 SELECT_COLUMN = 'GainerHall_Supply'
 # TEST_METHOD = ['seasonal']
-K = 0.2
 # TEST_METHOD = ['iqr']
 TEST_METHOD = ['quartile']
 # TEST_METHOD = ['level']
