@@ -1,3 +1,4 @@
+adtk==0.6.2
 alabaster @ file:///home/ktietz/src/ci/alabaster_1611921544520/work
 anaconda-client==1.7.2
 anaconda-navigator==2.0.3
@@ -62,11 +63,13 @@ fastcache==1.1.0
 filelock @ file:///home/linux1/recipes/ci/filelock_1610993975404/work
 flake8 @ file:///tmp/build/80754af9/flake8_1615834841867/work
 Flask @ file:///home/ktietz/src/ci/flask_1611932660458/work
+Flask-Cors @ file:///tmp/build/80754af9/flask-cors_1609957731919/work
 fsspec @ file:///tmp/build/80754af9/fsspec_1617959894824/work
 future==0.18.2
 gevent @ file:///C:/ci/gevent_1616773090559/work
 glob2 @ file:///home/linux1/recipes/ci/glob2_1610991677669/work
 greenlet @ file:///C:/ci/greenlet_1611958565931/work
+gunicorn==20.1.0
 h5py==2.10.0
 HeapDict==1.0.1
 html5lib @ file:///tmp/build/80754af9/html5lib_1593446221756/work
@@ -226,6 +229,7 @@ SQLAlchemy @ file:///C:/ci/sqlalchemy_1618090063261/work
 statsmodels==0.12.2
 sympy @ file:///C:/ci/sympy_1618255511605/work
 tables==3.6.1
+tabulate==0.8.9
 tblib @ file:///tmp/build/80754af9/tblib_1597928476713/work
 terminado==0.9.4
 testpath @ file:///home/ktietz/src/ci/testpath_1611930608132/work
