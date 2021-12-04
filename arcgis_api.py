@@ -1,17 +1,23 @@
 from enum import Enum
+from pathlib import Path
+
 import requests
 import html
 import pyproj
 from pyproj import transform, Transformer
 from common_utils import merge_dicts
+import os
+from urllib.parse import urlparse
+from os.path import exists
+import json
 
 MAX_OBJECTS_FROM_REQUEST = 2000
 UES_API_URL = "https://ues-arc.tamu.edu/arcgis/rest/services" + "/Yoho/UES_Operations/MapServer/"
 TAMU_BASEMAP_API_URL = "https://gis.tamu.edu/arcgis/rest/services/FCOR/TAMU_BaseMap/MapServer/"
-POST_FIX = "/query?"
 transformer = Transformer.from_crs('epsg:32139', 'epsg:4326')
 transformer2 = Transformer.from_crs('epsg:102100', 'epsg:4326')
-
+APP_DIR = ""
+MAP_CACHE_DIR = os.path.join("data", "map_cache")
 
 # arcgis map servers
 class UESMapServer(Enum):
@@ -46,7 +52,7 @@ def arcgis_api_request(base_api_url, server_num, query={}, printurl = False):
     #     print(i)
     querystr = "".join([ "&" + key + "=" + html.escape(query[key].replace("=", "%3D")) for key in query.keys()])
     # print("QueryStr: ", querystr)
-    url = base_api_url + str(server_num.value) + POST_FIX + querystr + "&f=pjson"
+    url = base_api_url + str(server_num.value) + "/query?" + querystr + "&f=pjson"
     if printurl:
         print("URL:", url)
     try:
@@ -59,29 +65,46 @@ def arcgis_api_request(base_api_url, server_num, query={}, printurl = False):
 # this function bypasses the 2000 limit of objectids that can be obtained by a single request
 # it breaks down the request because there is a 2000 request limit, this range object is [0, 2000, 4000, ...]
 # it returns a json
+# it also caches the request into a file in MAP_CACHE_DIR
 def unlimited_arcgis_api_request_json(base_api_url=UES_API_URL,
                                       server_num=UESMapServer.DOMESTIC_COLD_WATER,
                                       query={"where": "1=1"}, printurl = True):
-    # ask the server directly for the number of objects in the request
-    count = int(arcgis_api_request(
-        base_api_url, server_num, query=merge_dicts(query, {"returnCountOnly": "true"}), printurl=printurl
-    ).json()["count"])
+    # the following caches into a json file the call so that in future calls this request is faster
+    # the naming of the json is like so: the domain - server number - query string
+    global APP_DIR, MAP_CACHE_DIR
+    url_domain_only = urlparse(base_api_url).netloc
+    query_str_simplified = "".join([e + "-" + str(query[e]) for e in query])
+    filename_cache =r"{:}_{:}_{:}.txt".format(url_domain_only, server_num.value, query_str_simplified)
+    file_location = os.path.join(APP_DIR, MAP_CACHE_DIR, filename_cache)
 
-    # compiles the requests with different resultOffset [0, 2000, 4000, ...] into final_result_json
     final_result_json = {}
-    for request_size in range(0, count, MAX_OBJECTS_FROM_REQUEST):
-        request_json = arcgis_api_request(
-            base_api_url,
-            server_num,
-            query=merge_dicts(query, {"resultOffset": str(request_size)}),
-            printurl=printurl
-        ).json()
+    if exists(file_location):
+        with open(file_location, 'r') as file:
+            final_result_json = json.loads(file.read())
+    else:
+        # ask the server directly for the number of objects in the request
+        count = int(arcgis_api_request(
+            base_api_url, server_num, query=merge_dicts(query, {"returnCountOnly": "true"}), printurl=printurl
+        ).json()["count"])
 
-        # the header is only copied from the first iteration
-        if request_size == 0:
-            final_result_json = request_json
-        else:
-            final_result_json["features"] += request_json["features"]
+        # compiles the requests with different resultOffset [0, 2000, 4000, ...] into final_result_json
+        for request_size in range(0, count, MAX_OBJECTS_FROM_REQUEST):
+            request_json = arcgis_api_request(
+                base_api_url,
+                server_num,
+                query=merge_dicts(query, {"resultOffset": str(request_size)}),
+                printurl=printurl
+            ).json()
+
+            # the header is only copied from the first iteration
+            if request_size == 0:
+                final_result_json = request_json
+            else:
+                final_result_json["features"] += request_json["features"]
+
+        #write the json to the cached file for future calls
+        with open(file_location, 'w') as file:
+            file.write(json.dumps(final_result_json))
 
     return final_result_json
 

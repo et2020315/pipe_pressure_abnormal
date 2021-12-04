@@ -2,11 +2,10 @@ import json
 
 from flask import Flask
 from flask_cors import CORS
-from arcgis_api import convertToLatLng, UESMapServer
 from flask import request
-from plot_water import get_df
-from arcgis_api import convertToLatLng, UESMapServer, get_polylines_from_request, TAMUBaseMapServer, TAMU_BASEMAP_API_URL, get_polygons_from_request
-from plot_water import get_HDW_for_building
+
+import arcgis_api
+from arcgis_api import UESMapServer, get_polylines_from_request, TAMUBaseMapServer, get_polygons_from_request
 import os
 import pandas as pd
 from anomaly import dhw_validate_and_predict
@@ -17,6 +16,7 @@ app = Flask(__name__)
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
 
 CORS(app)
+arcgis_api.APP_DIR = app.root_path
 
 @app.route('/')
 def hello_world():  # put application's code here
