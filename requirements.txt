@@ -3,8 +3,9 @@ cors
 flask-cors
 gunicorn
 path
-pyproj
+pyproj==2.4.1
 ipython
 numpy
 pandas
 matplotlib
+geopandas

@@ -5,11 +5,10 @@ from flask_cors import CORS
 from flask import request
 
 import arcgis_api
-from arcgis_api import UESMapServer, get_polylines_from_request, TAMUBaseMapServer, get_polygons_from_request
+from arcgis_api import UESMapServer, get_lines_from_request, TAMUBaseMapServer, get_buildings_from_request
 import os
 import pandas as pd
 from anomaly import dhw_validate_and_predict
-from anomaly import modified_anomaly
 
 app = Flask(__name__)
 
@@ -21,99 +20,49 @@ arcgis_api.APP_DIR = app.root_path
 @app.route('/')
 def hello_world():  # put application's code here
     return {
-        'name' : "Welcome to pipe-leak's API!"
+        'data' : "Welcome to pipe-leak's API!"
     }
 
-@app.route('/test_pipes')
-def test_pipes():
-    testing_subgraph_polylines = get_polylines_from_request(server_num=UESMapServer.DOMESTIC_HOT_WATER)
+@app.route('/domestic_hot_water')
+def domestic_hot_water():
+    gdf = get_lines_from_request(server_num=UESMapServer.DOMESTIC_HOT_WATER)
+    gdf['color'] = "blue"
+    gdf['requestName'] = "dhw"
+    return gdf.to_json()
 
-    return { 'data': testing_subgraph_polylines}
+@app.route('/domestic_cold_water')
+def domestic_cold_water():
+    gdf = get_lines_from_request(server_num=UESMapServer.DOMESTIC_COLD_WATER)
+    gdf['color'] = "red"
+    gdf['requestName'] = "dcw"
+    return gdf.to_json()
 
-@app.route('/test_cold_pipes')
-def test_cold_pipes():
-    testing_subgraph_polylines_cold = get_polylines_from_request(server_num=UESMapServer.DOMESTIC_COLD_WATER)
+@app.route('/buildings')
+def buildings():
+    gdf = get_buildings_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
+    gdf['color'] = "orange"
+    gdf['requestName'] = "blds"
+    gdf['fillColor'] = "orange"
+    return gdf.to_json()
 
-    return { 'data': testing_subgraph_polylines_cold}
-@app.route('/test_buildings')
-def test_building():
-    testing_subgraph_polylines_buildings = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
-    return {'data': testing_subgraph_polylines_buildings}
+@app.route('/buildings_with_leaks')
+def buildings_with_leaks():
+    time_cutoff_left = request.args.get('time_cutoff_left')
+    detection_method = request.args.get('detection_method')
 
-@app.route('/test_affected_buildings')
-def test_affected_buildings():
-    testing_subgraph_polylines_affected_buildings = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "57, 78, 70, 308, 59, 978, 981, 56, 65, 980, 660, 677, 66, 688", "outFields" : "objectid"})
-    return {'data': testing_subgraph_polylines_affected_buildings}
+    gdf = get_buildings_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
+    gdf['color'] = "red"
+    gdf['requestName'] = "blds_with_leaks"
+    gdf['fillColor'] = "red"
 
-@app.route('/test_affected_kiest')
-def test_affected_kiest():
-    testing_subgraph_affected_kiest = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "57", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_kiest}
+    has_leak = []
+    for item in get_all_buildings()['buildings']:
+        data = dhw_validate_and_predict(item["name"], df, [detection_method], time_cutoff_left)
+        if data['last_day_has_leak']: has_leak.append(item['id'])
 
-@app.route('/test_affected_fountain')
-def test_affected_fountain():
-    testing_subgraph_affected_fountain = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "78", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_fountain}
+    gdf = gdf[gdf['OBJECTID'].isin(has_leak)]
 
-@app.route('/test_affected_gainer')
-def test_affected_gainer():
-    testing_subgraph_affected_gainer = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "70", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_gainer}
-
-@app.route('/test_affected_lacy')
-def test_affected_lacy():
-    testing_subgraph_affected_lacy = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "308", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_lacy}
-
-@app.route('/test_affected_harrell')
-def test_affected_harrell():
-    testing_subgraph_affected_harrell = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "59", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_harrell}
-
-@app.route('/test_affected_white')
-def test_affected_white():
-    testing_subgraph_affected_white = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "978", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_white}
-
-@app.route('/test_affected_harrington')
-def test_affected_harrington():
-    testing_subgraph_affected_harrington = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "981", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_harrington}
-
-@app.route('/test_affected_spence')
-def test_affected_spence():
-    testing_subgraph_affected_spence = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "56", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_spence}
-
-@app.route('/test_affected_briggs')
-def test_affected_briggs():
-    testing_subgraph_affected_briggs = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "65", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_briggs}
-
-@app.route('/test_affected_whiteley')
-def test_affected_whiteley():
-    testing_subgraph_affected_whiteley = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "980", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_whiteley}
-
-@app.route('/test_affected_wells')
-def test_affected_wells():
-    testing_subgraph_affected_wells = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "660", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_wells}
-
-@app.route('/test_affected_eppright')
-def test_affected_eppright():
-    testing_subgraph_affected_eppright = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "677", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_eppright}
-
-@app.route('/test_affected_underwood')
-def test_affected_underwood():
-    testing_subgraph_affected_underwood = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "66", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_underwood}
-
-@app.route('/test_affected_duncan')
-def test_affected_duncan():
-    testing_subgraph_affected_duncan = get_polygons_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000, query={"objectIds" : "688", "outFields" : "objectid"})
-    return {'data' : testing_subgraph_affected_duncan}
+    return gdf.to_json()
 
 @app.route('/test_data/<general_type>/<subtype>/<building_num>/', methods=['Get'])
 def test_data(general_type, subtype, building_num):
@@ -133,23 +82,23 @@ def test_data(general_type, subtype, building_num):
 
 
 @app.route('/get_all_buildings')
-def all_buildings():
+def get_all_buildings():
     return { "buildings": [
-        {"name": "KiestHall_Supply"},
-        {"name": "FountainHall_Supply"},
-        {"name": "GainerHall_Supply"},
-        {"name": "LacyHall_Supply"},
-        {"name": "HarrellHall_Supply"},
-        {"name": "WhiteHall_Supply"},
-        {"name": "HarringtonHall_Supply"},
-        {"name": "SpenceHall_Return"},
-        {"name": "BriggsHall_Return"},
-        {"name": "WhitelyHall_Return"},
-        {"name": "HarringtonHall_Return"},
-        {"name": "WellsResidenceHall_Supply"},
-        {"name": "EpprightResidenceHall_Supply"},
-        {"name": "UnderwoodResidenceHall_Supply"},
-        {"name": "DuncanDiningHall_Supply"},
+        {"name": "KiestHall_Supply", "id": 57},
+        {"name": "FountainHall_Supply", "id": 78},
+        {"name": "GainerHall_Supply", "id": 70},
+        {"name": "LacyHall_Supply", "id": 308},
+        {"name": "HarrellHall_Supply", "id": 59},
+        {"name": "WhiteHall_Supply", "id": 978},
+        {"name": "HarringtonHall_Supply", "id": 981},
+        {"name": "SpenceHall_Return", "id": 56},
+        {"name": "BriggsHall_Return", "id": 65},
+        {"name": "WhitelyHall_Return", "id": 980},
+        {"name": "HarringtonHall_Return", "id": 981},
+        {"name": "WellsResidenceHall_Supply", "id": 660},
+        {"name": "EpprightResidenceHall_Supply", "id": 677},
+        {"name": "UnderwoodResidenceHall_Supply", "id": 66},
+        {"name": "DuncanDiningHall_Supply", "id": 688},
     ]}
 
 
@@ -169,7 +118,3 @@ def get_building_map_data_for(building):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-#first algorithm flags everything after 3 hours
-# it is showing everything that is outside the bounds
-# it is not bad to flag everything
