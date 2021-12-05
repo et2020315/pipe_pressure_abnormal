@@ -55,6 +55,7 @@ def buildings_with_leaks():
     gdf['color'] = "red"
     gdf['requestName'] = "blds_with_leaks"
     gdf['fillColor'] = "purple"
+    gdf['fillOpacity'] = 1.0
 
     return gdf.to_json()
 
