@@ -3,7 +3,6 @@ cors
 flask-cors
 gunicorn
 path
-pyproj==2.4.1
 ipython
 numpy
 pandas
