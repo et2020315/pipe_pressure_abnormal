@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 from os.path import exists
 import json
 import geopandas as gpd
+from anomaly import dhw_validate_and_predict
 
 MAX_OBJECTS_FROM_REQUEST = 2000
 UES_API_URL = "https://ues-arc.tamu.edu/arcgis/rest/services/Yoho/UES_Operations/MapServer/"
@@ -45,6 +46,18 @@ def arcgis_api_request(base_api_url, server_num, query={}, printurl = False):
         print("Error on request at", url)
         return None
 
+
+def get_buildings_with_leaks(time_cutoff_left, detection_method, df ,all_buildings):
+    gdf = get_buildings_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
+
+    has_leak = []
+    for item in all_buildings['buildings']:
+        data = dhw_validate_and_predict(item["name"], df, [detection_method], time_cutoff_left)
+        if data['last_day_has_leak']: has_leak.append(item['id'])
+
+    gdf = gdf[gdf['OBJECTID'].isin(has_leak)]
+
+    return gdf
 
 # this function bypasses the 2000 limit of objectids that can be obtained by a single request
 # it breaks down the request because there is a 2000 request limit, this range object is [0, 2000, 4000, ...]

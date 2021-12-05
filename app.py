@@ -47,22 +47,28 @@ def buildings():
 
 @app.route('/buildings_with_leaks')
 def buildings_with_leaks():
-    time_cutoff_left = request.args.get('time_cutoff_left')
-    detection_method = request.args.get('detection_method')
-
-    gdf = get_buildings_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
+    gdf = arcgis_api.get_buildings_with_leaks(
+        request.args.get('time_cutoff_left'),
+        request.args.get('detection_method'),
+        df,
+        get_all_buildings())
     gdf['color'] = "red"
     gdf['requestName'] = "blds_with_leaks"
-    gdf['fillColor'] = "red"
-
-    has_leak = []
-    for item in get_all_buildings()['buildings']:
-        data = dhw_validate_and_predict(item["name"], df, [detection_method], time_cutoff_left)
-        if data['last_day_has_leak']: has_leak.append(item['id'])
-
-    gdf = gdf[gdf['OBJECTID'].isin(has_leak)]
+    gdf['fillColor'] = "purple"
 
     return gdf.to_json()
+
+@app.route('/center_of_buildings_with_leaks')
+def center_of_buildings_with_leaks():
+    gdf = arcgis_api.get_buildings_with_leaks(
+        request.args.get('time_cutoff_left'),
+        request.args.get('detection_method'),
+        df,
+        get_all_buildings())
+
+    bounds = gdf.total_bounds
+    return { "lat": (bounds[3] - bounds[1])/2.0 + bounds[1],
+             "lng" : (bounds[2] - bounds[0])/2.0 + bounds[0] }
 
 @app.route('/test_data/<general_type>/<subtype>/<building_num>/', methods=['Get'])
 def test_data(general_type, subtype, building_num):
