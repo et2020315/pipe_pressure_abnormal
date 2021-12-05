@@ -26,14 +26,14 @@ def hello_world():  # put application's code here
 @app.route('/domestic_hot_water')
 def domestic_hot_water():
     gdf = get_lines_from_request(server_num=UESMapServer.DOMESTIC_HOT_WATER)
-    gdf['color'] = "blue"
+    gdf['color'] = "red"
     gdf['requestName'] = "dhw"
     return gdf.to_json()
 
 @app.route('/domestic_cold_water')
 def domestic_cold_water():
     gdf = get_lines_from_request(server_num=UESMapServer.DOMESTIC_COLD_WATER)
-    gdf['color'] = "red"
+    gdf['color'] = "blue"
     gdf['requestName'] = "dcw"
     return gdf.to_json()
 
