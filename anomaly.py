@@ -110,6 +110,29 @@ def dhw_validate_and_predict(hall_type, dataframe, method, date):
   return jsonlist
 
 
+def remove_non_consecutive_abnormalities(df, column_name, new_column_name, num_of_consecutive_trues):
+  new_data = []
+  subleak_points = df[column_name]
+  count = 0
+  for index, item in enumerate(subleak_points):
+    next_is_false = True if index + 1 >= len(subleak_points) else not subleak_points.iloc[index + 1]
+    if item:
+      count += 1
+      if next_is_false and count >= num_of_consecutive_trues:
+        for i in range(count):
+          new_data.append(True)
+      elif next_is_false:
+        for i in range(count):
+          new_data.append(False)
+      else:
+        continue
+    else:
+      count = 0
+      new_data.append(False)
+
+  df[new_column_name] = new_data
+
+
 def generate_json(train_df, anomaly, hall_type):
   try:
     train_df = train_df.reset_index()
@@ -122,16 +145,11 @@ def generate_json(train_df, anomaly, hall_type):
     #print("len = " + str(len(temp)))
     time_list = [item.strftime("%y-%m-%d %H:%M:%S") for item in temp.loc[:, 'Timestamp']]
 
-    # remove single hour false positive
-    # modified = modified_anomaly(3, temp['isAbnormal'])
-    # if (len(modified) == 0):
-    #   print("empty length ")
-    #   print("length of original = " + len(temp['isAbnormal']))
-    #   return {}
-    # temp['isAbnormal'] = modified
+    #when abnormalities are not consecutive for 4 hours or more, do not record them
+    remove_non_consecutive_abnormalities(temp, "isAbnormal", "pressure_points", 5)
 
-    abnormality_list = [item for item in temp['isAbnormal']]
-    last_day_has_leak_df = temp.loc[:, 'isAbnormal'].iloc[-24: -1]
+    abnormality_list = [item for item in temp['pressure_points']]
+    last_day_has_leak_df = temp.loc[:, 'pressure_points'].iloc[-24: -1]
 
 
     dict_item = {'time_points' : time_list,
@@ -142,18 +160,6 @@ def generate_json(train_df, anomaly, hall_type):
   except:
     traceback.print_exc()
 
-# def datesdf2json(datesdf):
-#   display(datesdf)
-#   print("datesdf shape -----------------------")
-#   print(datesdf.shape)
-#
-#   start_list = [starttime.strftime(EXACT_TIME_FORMAT) for starttime in datesdf.loc[:, 'Timestamp_start']]
-#   end_list = [endtime.strftime(EXACT_TIME_FORMAT) for endtime in datesdf.loc[:, 'Timestamp_end']]
-#
-#   jsondates = {'start': start_list, 'end': end_list}
-#   print("json exact start and end dates")
-#   print(jsondates)
-#   return jsondates
 
 def modified_anomaly(NUM, tf):
   counts = []
@@ -193,58 +199,13 @@ def modified_anomaly(NUM, tf):
   return modified2
 
 
-# def getdates(anomaly, hall_type):
-#   series = anomaly[hall_type]
-#   anomaly['prev'] = anomaly[hall_type].shift()
-#   anomaly['diff'] = anomaly[hall_type] - anomaly['prev']
-#   anomaly = anomaly.reset_index()
-#   ones = anomaly[anomaly['diff'] >= 1.0]
-#   ones.reset_index(inplace=True)
-#   negones = anomaly[anomaly['diff'] <= -1.0]
-#   negones.reset_index(inplace=True)
-#   temp = negones[['Timestamp']]
-#
-#   datesdf = ones[['Timestamp']].join(temp, lsuffix="_start", rsuffix='_end')
-#   # Exact start and end time
-#   print("----------- kakaka join sucessfully")
-#   jsondates = datesdf2json(datesdf)
-#
-#   # josn date range
-#   print(ones.columns)
-#   series = ones.loc[:, 'Timestamp']
-#   series = series.dt.date
-#   curr = series[0];
-#   next = series[0];
-#   start_lst = []
-#   end_lst = []
-#
-#   for i in range(1, len(series)):
-#     item = series[i] - series[i - 1]
-#     days = pd.Timedelta("14d")
-#     oneday = pd.Timedelta("1d")
-#     if (item <= days):
-#       next = series[i]
-#     else:
-#       start_lst.append(curr.strftime(DATE_FORMAT_OUTPUT))
-#       end_lst.append(next.strftime(DATE_FORMAT_OUTPUT))
-#       curr = series[i]
-#       next = series[i]
-#
-#     if (i == len(series) - 1):
-#       start_lst.append(curr.strftime(DATE_FORMAT_OUTPUT))
-#       end_lst.append(next.strftime(DATE_FORMAT_OUTPUT))
-#
-#   aggregate_range = {'aggregateStart': start_lst, 'aggregateEnd': end_lst}
-#   print("returning jsondates df -> json, lst , list of json date range")
-#   return jsondates, aggregate_range
-
-
 def moving_average_method(dataframe, hall_type):
   pass
 
+
 if __name__ == "__main__":
   df = pd.read_csv("data/finalDHW.csv")
-  data = dhw_validate_and_predict(SELECT_COLUMN, df, TEST_METHOD, "10-10-2020")
+  data = dhw_validate_and_predict(SELECT_COLUMN, df, TEST_METHOD, "2021-02-20")
 
 
 

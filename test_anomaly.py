@@ -60,7 +60,6 @@ def get_method_false_positive(method, day_nums):
         our_algorithm_detects_abnormality = get_method_precision(method, [day]) == 1.0
         there_is_actual_leak = day in day_nums
         if our_algorithm_detects_abnormality and there_is_actual_leak:
-            print("wooohooo")
             count_days_true_positive += 1
         elif our_algorithm_detects_abnormality and not there_is_actual_leak:
             count_days_false_positive += 1
@@ -77,23 +76,21 @@ def get_method_false_positive(method, day_nums):
             count_days_false_positive + count_days_false_negative + count_days_true_positive + count_days_true_negative)
 
 
-
 def test_error_rate():
-    assert get_method_false_positive(['iqr'], pipeleaks_datelist_merged) == 1.0
-
+    assert get_method_false_positive(['iqr'], pipeleaks_datelist_merged) == 0.0
 
 # check if precisions are 100%
-def test_iqr():
+def test_precision_iqr():
     assert get_method_precision(['iqr'], pipeleaks_datelist_merged) == 1.0
 
 
-def test_quartile():
+def test_precision_quartile():
     assert get_method_precision(['quartile'], pipeleaks_datelist_merged) == 1.0
 
 
-def test_seasonal():
+def test_precision_seasonal():
     assert get_method_precision(['seasonal'], pipeleaks_datelist_merged) == 1.0
 
 
-def test_level():
+def test_precision_level():
     assert get_method_precision(['level'], pipeleaks_datelist_merged) == 1.0
