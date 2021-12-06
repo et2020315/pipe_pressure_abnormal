@@ -78,21 +78,50 @@ def get_method_false_positive(method, day_nums):
 
 
 def test_error_rate():
+    print("iqr = ")
     print(get_method_false_positive(['iqr'], pipeleaks_datelist_merged))
+    print("seasonal = ")
+    print(get_method_false_positive(['seasonal'],pipeleaks_datelist_merged ))
+    print("quartile = ")
+    print(get_method_false_positive(['quartile'], pipeleaks_datelist_merged))
+    print("level = ")
+    print(get_method_false_positive(['level'], pipeleaks_datelist_merged))
 
-
+#
 # check if precisions are 100%
 def test_precision_iqr():
-    assert get_method_precision(['iqr'], pipeleaks_datelist_merged) == 1.0
+    precision, recall = get_method_false_positive(['iqr'], pipeleaks_datelist_merged)
+    assert precision == 1.0
+
+# check if precisions are 100%
+def test_recall_iqr():
+    precision, recall = get_method_false_positive(['iqr'], pipeleaks_datelist_merged)
+    assert recall == 1.0
 
 
 def test_precision_quartile():
-    assert get_method_precision(['quartile'], pipeleaks_datelist_merged) == 1.0
+    precision, recall = get_method_false_positive(['quartile'], pipeleaks_datelist_merged)
+    assert precision == 1.0
+
+def test_recall_quartile():
+    precision, recall = get_method_false_positive(['quartile'], pipeleaks_datelist_merged)
+    assert recall == 1.0
 
 
 def test_precision_seasonal():
-    assert get_method_precision(['seasonal'], pipeleaks_datelist_merged) == 1.0
+    precision, recall = get_method_false_positive(['seasonal'], pipeleaks_datelist_merged)
+    assert precision == 1.0
 
+
+def test_recall_seasonal():
+    precision, recall = get_method_false_positive(['seasonal'], pipeleaks_datelist_merged)
+    assert recall == 1.0
 
 def test_precision_level():
-    assert get_method_precision(['level'], pipeleaks_datelist_merged) == 1.0
+    precision, recall = get_method_false_positive(['level'], pipeleaks_datelist_merged)
+    assert precision == 1.0
+
+
+def test_recall_level():
+    precision, recall = get_method_false_positive(['level'], pipeleaks_datelist_merged)
+    assert recall == 1.0
