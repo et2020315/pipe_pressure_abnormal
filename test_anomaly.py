@@ -72,12 +72,14 @@ def get_method_false_positive(method, day_nums):
     print("false positive = " + str(count_days_false_positive))
     print(" false negative = " + str(count_days_false_negative))
     print("true negative = " + str(count_days_true_negative))
-    return (count_days_false_positive + count_days_false_negative) / (
-            count_days_false_positive + count_days_false_negative + count_days_true_positive + count_days_true_negative)
+
+    return (count_days_true_positive / count_days_true_positive + count_days_false_positive), \
+           (count_days_true_positive, count_days_true_positive + count_days_false_negative)
 
 
 def test_error_rate():
-    assert get_method_false_positive(['iqr'], pipeleaks_datelist_merged) == 0.0
+    print(get_method_false_positive(['iqr'], pipeleaks_datelist_merged))
+
 
 # check if precisions are 100%
 def test_precision_iqr():
