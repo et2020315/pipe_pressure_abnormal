@@ -1,10 +1,12 @@
 adtk
 cors
-flask-cors
+flask
 gunicorn
+flask-cors
 path
 ipython
 numpy
 pandas
 matplotlib
 geopandas
+requests
