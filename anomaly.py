@@ -8,9 +8,11 @@ import pandas as pd
 import traceback
 
 # global parameters . set to be constant if all caps, you can change methods by passing it as array
+# Interquartile
+IQR_C = 2.5
 #**** Quartile method
-HIGH_Q = 1
-LOW_Q = 0.10
+HIGH_Q = 1.0
+LOW_Q = 0.01
 #**** level method
 AWAY_FROM_MU_LEVEL = 3
 WINSIZE_LEVEL = 7
@@ -79,7 +81,7 @@ def choose_detector(method):
     if method[0] == 'seasonal':
       return SeasonalAD(freq=WINDOW_SEASON)
     elif method[0] == 'iqr':
-      return InterQuartileRangeAD(c=1)
+      return InterQuartileRangeAD(c=IQR_C)
     elif method[0] == 'quartile':
       return QuantileAD(low=LOW_Q, high=HIGH_Q)
     elif method[0] == 'level':
