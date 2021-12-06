@@ -73,8 +73,8 @@ def get_method_false_positive(method, day_nums):
     print(" false negative = " + str(count_days_false_negative))
     print("true negative = " + str(count_days_true_negative))
 
-    return (count_days_true_positive / count_days_true_positive + count_days_false_positive), \
-           (count_days_true_positive, count_days_true_positive + count_days_false_negative)
+    return (count_days_true_positive / (count_days_true_positive + count_days_false_positive)), \
+           (count_days_true_positive / (count_days_true_positive + count_days_false_negative))
 
 
 def test_error_rate():
