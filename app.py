@@ -7,6 +7,7 @@ from arcgis_api import UESMapServer, get_lines_from_request, TAMUBaseMapServer, 
 import os
 import pandas as pd
 from anomaly import dhw_validate_and_predict, refine_dataframe
+import time
 
 app = Flask(__name__)
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
