@@ -9,17 +9,18 @@ import pandas as pd
 from anomaly import dhw_validate_and_predict
 
 app = Flask(__name__)
-
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
 
 CORS(app)
 arcgis_api.APP_DIR = app.root_path
+
 
 @app.route('/')
 def hello_world():  # put application's code here
     return {
         'data' : "Welcome to pipe-leak's API!"
     }
+
 
 @app.route('/domestic_hot_water')
 def domestic_hot_water():
@@ -28,12 +29,14 @@ def domestic_hot_water():
     gdf['requestName'] = "dhw"
     return gdf.to_json()
 
+
 @app.route('/domestic_cold_water')
 def domestic_cold_water():
     gdf = get_lines_from_request(server_num=UESMapServer.DOMESTIC_COLD_WATER)
     gdf['color'] = "blue"
     gdf['requestName'] = "dcw"
     return gdf.to_json()
+
 
 @app.route('/buildings')
 def buildings():
@@ -43,9 +46,10 @@ def buildings():
     gdf['fillColor'] = "orange"
     return gdf.to_json()
 
+
 @app.route('/buildings_with_leaks')
 def buildings_with_leaks():
-    gdf = arcgis_api.get_buildings_with_leaks(
+    gdf = arcgis_api.get_buildings_mapdata_with_leaks(
         request.args.get('time_cutoff_left'),
         request.args.get('detection_method'),
         df,
@@ -58,9 +62,17 @@ def buildings_with_leaks():
 
     return gdf.to_json()
 
+
+@app.route('/buildings_with_leak_indicators/<building_name>')
+def buildings_with_leak_indicators(building_name):
+    data = dhw_validate_and_predict(building_name, df, [request.args.get('detection_method')], request.args.get('time_cutoff_left'))
+
+    return {"last_day_has_leak": data["last_day_has_leak"]}
+
+
 @app.route('/center_of_buildings_with_leaks')
 def center_of_buildings_with_leaks():
-    gdf = arcgis_api.get_buildings_with_leaks(
+    gdf = arcgis_api.get_buildings_mapdata_with_leaks(
         request.args.get('time_cutoff_left'),
         request.args.get('detection_method'),
         df,
@@ -69,6 +81,7 @@ def center_of_buildings_with_leaks():
     bounds = gdf.total_bounds
     return { "lat": (bounds[3] - bounds[1])/2.0 + bounds[1],
              "lng" : (bounds[2] - bounds[0])/2.0 + bounds[0] }
+
 
 @app.route('/test_data/<general_type>/<subtype>/<building_num>/', methods=['Get'])
 def test_data(general_type, subtype, building_num):
@@ -115,12 +128,14 @@ def get_pressure_data_for(building):
     data = dhw_validate_and_predict(building, df, [detection_method], time_cutoff_left)
     return data
 
+
 @app.route("/get_building_map_data_for/<building>")
 def get_building_map_data_for(building):
     time_cutoff_left = request.args.get('time_cutoff_left')
     detection_method = request.args.get('detection_method')
     data = dhw_validate_and_predict(building, df, [detection_method], time_cutoff_left)
     return data
+
 
 if __name__ == '__main__':
     app.run(debug=True)

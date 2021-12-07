@@ -47,7 +47,7 @@ def arcgis_api_request(base_api_url, server_num, query={}, printurl = False):
         return None
 
 
-def get_buildings_with_leaks(time_cutoff_left, detection_method, df ,all_buildings):
+def get_buildings_mapdata_with_leaks(time_cutoff_left, detection_method, df, all_buildings):
     gdf = get_buildings_from_request(server_num=TAMUBaseMapServer.UNIV_BUILDING_LESS_3000)
 
     has_leak = []
