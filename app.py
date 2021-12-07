@@ -6,10 +6,11 @@ import arcgis_api
 from arcgis_api import UESMapServer, get_lines_from_request, TAMUBaseMapServer, get_buildings_from_request
 import os
 import pandas as pd
-from anomaly import dhw_validate_and_predict
+from anomaly import dhw_validate_and_predict, refine_dataframe
 
 app = Flask(__name__)
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
+df = refine_dataframe(df)
 
 CORS(app)
 arcgis_api.APP_DIR = app.root_path

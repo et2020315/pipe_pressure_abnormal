@@ -1,6 +1,6 @@
 import pandas as pd
 import app
-from anomaly import dhw_validate_and_predict
+from anomaly import dhw_validate_and_predict, dhw_validate_and_predict_get_df
 import pandas as pd
 
 '''
@@ -11,17 +11,17 @@ visible fluctuations that occurred a few days before the indicated dates.
 The incident numbers and dates come from the file DHW_Incidents1.pdf found in the MS Teams.
 More data can be found in PipeLeakLocations.ipynb
 '''
-actual_pipeleak_fluctuation_days = [["2020-12-29", "2021-01-12"],  # incident 3
-                                    ["2021-03-20", "2021-03-23"],  # incident 4
-                                    ["2021-06-07", "2021-06-08"],  # incident 6
-                                    ["2021-08-04", "2021-08-04"],  # incident 8
-                                    ["2021-08-23", "2021-08-24"]]  # incident 9
+actual_pipeleak_fluctuation_days = [["2020-12-28 11:00", "2021-01-11 18:00"],  # incident 3
+                                    ["2021-03-20 2:00", "2021-03-23 23:00"],  # incident 4
+                                    ["2021-06-07 18:00", "2021-06-08 00:00"],  # incident 6
+                                    ["2021-08-04 4:00", "2021-08-04 10:00"],  # incident 8
+                                    ["2021-08-23 21:00", "2021-08-24 2:00"]]  # incident 9
 
 '''
 create the object pipeleaks_datelist_merged, which is a series of dates (each day in
 which there was a leak)
 '''
-datelists_separated = [pd.date_range(e[0], e[1]) for e in actual_pipeleak_fluctuation_days]
+datelists_separated = [pd.date_range(e[0], e[1], freq="1H") for e in actual_pipeleak_fluctuation_days]
 
 for index, datelist in enumerate(datelists_separated):
     if index == 0:
@@ -56,7 +56,7 @@ def get_method_false_positive(method, day_nums):
     count_days_false_negative = 0
     count_days_true_negative = 0
     # assert test_method_precision(['iqr'], [119]) == 1.0
-    for day in pd.date_range("2020-12-29", "2021-10-01"):
+    for day in pd.date_range("2020-12-29", "2021-01-05", freq="1H"):
         our_algorithm_detects_abnormality = get_method_precision(method, [day]) == 1.0
         there_is_actual_leak = day in day_nums
         if our_algorithm_detects_abnormality and there_is_actual_leak:
