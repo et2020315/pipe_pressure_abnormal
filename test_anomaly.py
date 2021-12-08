@@ -2,6 +2,7 @@ import pandas as pd
 import app
 from anomaly import dhw_validate_and_predict, dhw_validate_and_predict_get_df
 import pandas as pd
+import numpy as np
 
 '''
 This list contains the dates from the leaks of the hot domestic water distribution
@@ -31,24 +32,13 @@ for index, datelist in enumerate(datelists_separated):
         pipeleaks_datelist_merged = pipeleaks_datelist_merged.append(datelist)
 
 
-def get_method_precision(method, day_nums):
-    matches_actual_leak_vs_found_leak = 0
-    for item in day_nums:
-        buildings = app.get_all_buildings()['buildings']
-        buildings = [item['name'] for item in buildings]
-        data = [dhw_validate_and_predict_get_df(building, app.df, method, item)[1] for building in
-                buildings]
-        has_at_least_one_leak_detected = False
-        for subitem in data:
-            if subitem:
-                has_at_least_one_leak_detected = True
-                break
+def get_method_precision(method, day):
+    buildings = app.get_all_buildings()['buildings']
+    buildings = [item['name'] for item in buildings]
+    data = [dhw_validate_and_predict_get_df(building, app.df, method, day)[1] for building in
+            buildings]
 
-        if has_at_least_one_leak_detected:
-            matches_actual_leak_vs_found_leak += 1
-
-    # return precision
-    return matches_actual_leak_vs_found_leak / len(day_nums)
+    return np.any(data)
 
 
 def get_method_false_positive(method, day_nums):
@@ -57,8 +47,8 @@ def get_method_false_positive(method, day_nums):
     count_days_false_negative = 0
     count_days_true_negative = 0
     # assert test_method_precision(['iqr'], [119]) == 1.0
-    for day in pd.date_range("2020-12-29", "2021-01-05", freq="1H"):
-        our_algorithm_detects_abnormality = get_method_precision(method, [day]) == 1.0
+    for day in pd.date_range("2020-12-29", "2021-10-01", freq="1H"):
+        our_algorithm_detects_abnormality = get_method_precision(method, day) == 1.0
         there_is_actual_leak = day in day_nums
         if our_algorithm_detects_abnormality and there_is_actual_leak:
             count_days_true_positive += 1
