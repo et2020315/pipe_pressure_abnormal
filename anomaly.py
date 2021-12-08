@@ -10,7 +10,7 @@ import traceback
 # global parameters . set to be constant if all caps, you can change methods by passing it as array
 NUM_CONSECUTIVE_ANOMALIES_ALLOWED = 2
 # Interquartile
-IQR_C = 3.0
+IQR_C = 0.8
 #**** Quartile method
 HIGH_Q = 1.0
 LOW_Q = 0.10

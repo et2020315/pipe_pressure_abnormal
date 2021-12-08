@@ -12,6 +12,7 @@ The incident numbers and dates come from the file DHW_Incidents1.pdf found in th
 More data can be found in PipeLeakLocations.ipynb
 '''
 actual_pipeleak_fluctuation_days = [["2020-12-28 11:00", "2021-01-11 18:00"],  # incident 3
+                                    ["2021-02-15 10:00", "2021-02-18 12:00"],
                                     ["2021-03-20 2:00", "2021-03-23 23:00"],  # incident 4
                                     ["2021-06-07 18:00", "2021-06-08 00:00"],  # incident 6
                                     ["2021-08-04 4:00", "2021-08-04 10:00"],  # incident 8
@@ -35,11 +36,11 @@ def get_method_precision(method, day_nums):
     for item in day_nums:
         buildings = app.get_all_buildings()['buildings']
         buildings = [item['name'] for item in buildings]
-        data = [dhw_validate_and_predict(building, app.df, method, item) for building in
+        data = [dhw_validate_and_predict_get_df(building, app.df, method, item)[1] for building in
                 buildings]
         has_at_least_one_leak_detected = False
         for subitem in data:
-            if subitem['last_day_has_leak']:
+            if subitem:
                 has_at_least_one_leak_detected = True
                 break
 
@@ -80,12 +81,12 @@ def get_method_false_positive(method, day_nums):
 def test_error_rate():
     print("iqr = ")
     print(get_method_false_positive(['iqr'], pipeleaks_datelist_merged))
-    print("seasonal = ")
-    print(get_method_false_positive(['seasonal'],pipeleaks_datelist_merged ))
-    print("quartile = ")
-    print(get_method_false_positive(['quartile'], pipeleaks_datelist_merged))
-    print("level = ")
-    print(get_method_false_positive(['level'], pipeleaks_datelist_merged))
+    #print("seasonal = ")
+    #print(get_method_false_positive(['seasonal'],pipeleaks_datelist_merged ))
+    #print("quartile = ")
+    #print(get_method_false_positive(['quartile'], pipeleaks_datelist_merged))
+    #print("level = ")
+    #print(get_method_false_positive(['level'], pipeleaks_datelist_merged))
 
 #
 # check if precisions are 100%
