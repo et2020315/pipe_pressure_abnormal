@@ -6,7 +6,7 @@ import arcgis_api
 from arcgis_api import UESMapServer, get_lines_from_request, TAMUBaseMapServer, get_buildings_from_request
 import os
 import pandas as pd
-from anomaly import dhw_validate_and_predict, refine_dataframe
+from anomaly import dhw_validate_and_predict, refine_dataframe, dhw_validate_and_predict_get_df
 import time
 
 app = Flask(__name__)
@@ -67,9 +67,9 @@ def buildings_with_leaks():
 
 @app.route('/buildings_with_leak_indicators/<building_name>')
 def buildings_with_leak_indicators(building_name):
-    data = dhw_validate_and_predict(building_name, df, [request.args.get('detection_method')], request.args.get('time_cutoff_left'))
+    data = dhw_validate_and_predict_get_df(building_name, df, [request.args.get('detection_method')], request.args.get('time_cutoff_left'))
 
-    return {"last_day_has_leak": data["last_day_has_leak"]}
+    return {"last_day_has_leak": data[1]}
 
 
 @app.route('/center_of_buildings_with_leaks')
