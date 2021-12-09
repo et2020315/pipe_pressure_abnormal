@@ -13,9 +13,11 @@ The incident numbers and dates come from the file DHW_Incidents1.pdf found in th
 More data can be found in PipeLeakLocations.ipynb
 '''
 actual_pipeleak_fluctuation_days = [["2020-12-28 11:00", "2021-01-11 18:00"],  # incident 3
-                                    ["2021-02-15 10:00", "2021-02-18 12:00"],
+                                    ["2021-02-15 10:00", "2021-02-18 12:00"], # february winter storm
                                     ["2021-03-20 2:00", "2021-03-23 23:00"],  # incident 4
+                                    ["2021-05-10 12:00", "2021-05-29 10:00"], # suspected leak
                                     ["2021-06-07 18:00", "2021-06-08 00:00"],  # incident 6
+                                    ["2021-06-23 10:00", "2021-07-19 12:00"], # suspected leak
                                     ["2021-08-04 4:00", "2021-08-04 10:00"],  # incident 8
                                     ["2021-08-23 21:00", "2021-08-24 2:00"]]  # incident 9
 
@@ -31,12 +33,13 @@ for index, datelist in enumerate(datelists_separated):
     else:
         pipeleaks_datelist_merged = pipeleaks_datelist_merged.append(datelist)
 
+buildings = app.get_all_buildings()['buildings']
+
 
 def get_method_precision(method, day):
-    buildings = app.get_all_buildings()['buildings']
-    buildings = [item['name'] for item in buildings]
-    data = [dhw_validate_and_predict_get_df(building, app.df, method, day)[1] for building in
-            buildings]
+    global buildings
+    data = [dhw_validate_and_predict_get_df(building["name"], app.df, method, day)[2]
+            for building in buildings]
 
     return np.any(data)
 
@@ -67,10 +70,27 @@ def get_method_false_positive(method, day_nums):
     return (count_days_true_positive / (count_days_true_positive + count_days_false_positive)), \
            (count_days_true_positive / (count_days_true_positive + count_days_false_negative))
 
+def test_method_precision_once():
+    print("test_method_precision")
+    assert get_method_precision(["iqr"], "2021-01-05")
+    assert get_method_precision(["iqr"], "2021-01-11") == False
+    assert get_method_precision(["iqr"], "2021-01-30") == False
 
-def test_error_rate():
+def test_error_rate_iqr():
     print("iqr = ")
     print(get_method_false_positive(['iqr'], pipeleaks_datelist_merged))
+
+
+def test_error_rate_quartile():
+    print("iqr = ")
+    print(get_method_false_positive(['quartile'], pipeleaks_datelist_merged))
+
+
+def test_error_rate_seasonal():
+    print("iqr = ")
+    print(get_method_false_positive(['seasonal'], pipeleaks_datelist_merged))
+
+
     #print("seasonal = ")
     #print(get_method_false_positive(['seasonal'],pipeleaks_datelist_merged ))
     #print("quartile = ")

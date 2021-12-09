@@ -6,11 +6,12 @@ from adtk.detector import QuantileAD
 from adtk.detector import InterQuartileRangeAD
 import pandas as pd
 import traceback
+import numpy as np
 
 # global parameters . set to be constant if all caps, you can change methods by passing it as array
 NUM_CONSECUTIVE_ANOMALIES_ALLOWED = 2
 # Interquartile
-IQR_C = 0.8
+IQR_C = 4.0
 #**** Quartile method
 HIGH_Q = 1.0
 LOW_Q = 0.10
@@ -57,7 +58,7 @@ def generate_train_only(date, dataframe):
 # use 'time' interpolation to fill the gaps
 def interpolate(dataframe):
   if (len(dataframe.isna().any(axis = 1)) > 0):
-    dataframe["pressure_points"] = dataframe["pressure_points"].interpolate(method = 'time')
+    dataframe = dataframe.interpolate(method = 'time')
   return dataframe
 
 
@@ -89,6 +90,7 @@ def predict_plot_train(detector, train_df):
 def refine_dataframe(dataframe):
   dataframe = dataframe.rename(columns={"Timestamp": "time_points"})
   dataframe = convert_datetime(dataframe)
+  dataframe = interpolate(dataframe)
 
   return dataframe
 
@@ -96,19 +98,18 @@ def refine_dataframe(dataframe):
 def dhw_validate_and_predict_get_df(hall_type: str, dataframe : pd.DataFrame, method : [str], date):
   dataframe = dataframe.rename(columns={hall_type: "pressure_points"})
   dataframe = dataframe[["pressure_points"]]
-  dataframe = interpolate(dataframe)
   train_df = generate_train_only(date, dataframe)
   detector = choose_detector(method)
   anomaly_with_train_df = predict_plot_train(detector, train_df)
 
-  last_day_has_leak_df = anomaly_with_train_df["leak_points"].iloc[-24: -1]
-  last_day_has_leak = len(last_day_has_leak_df[last_day_has_leak_df]) >= 1
+  last_day_has_leak = np.any(anomaly_with_train_df["leak_points"][-24:])
+  last_hour_has_leak = anomaly_with_train_df["leak_points"][-1]
 
-  return anomaly_with_train_df, last_day_has_leak
+  return anomaly_with_train_df, last_day_has_leak, last_hour_has_leak
 
 
 def dhw_validate_and_predict(hall_type, dataframe, method, date):
-  train_df_with_anomaly, last_day_has_leak = dhw_validate_and_predict_get_df(hall_type, dataframe, method, date)
+  train_df_with_anomaly, last_day_has_leak, last_hour_has_leak = dhw_validate_and_predict_get_df(hall_type, dataframe, method, date)
 
   jsonlist = generate_json(train_df_with_anomaly, last_day_has_leak)
   return jsonlist
@@ -143,7 +144,7 @@ def generate_json(train_df_with_anomaly: pd.DataFrame, last_day_has_leak : bool)
   dataframe = train_df_with_anomaly.reset_index()
   dataframe["time_points"] = dataframe["time_points"].dt.strftime(EXACT_TIME_FORMAT)
   dict_item = dataframe.to_dict("list")
-  dict_item["last_day_has_leak"] = last_day_has_leak
+  dict_item["last_day_has_leak"] = bool(last_day_has_leak)
 
   return dict_item
 

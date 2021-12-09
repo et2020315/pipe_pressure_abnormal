@@ -7,7 +7,6 @@ from arcgis_api import UESMapServer, get_lines_from_request, TAMUBaseMapServer, 
 import os
 import pandas as pd
 from anomaly import dhw_validate_and_predict, refine_dataframe, dhw_validate_and_predict_get_df
-import time
 
 app = Flask(__name__)
 df = pd.read_csv(os.path.join(app.root_path, "data/finalDHW.csv"))
@@ -69,7 +68,7 @@ def buildings_with_leaks():
 def buildings_with_leak_indicators(building_name):
     data = dhw_validate_and_predict_get_df(building_name, df, [request.args.get('detection_method')], request.args.get('time_cutoff_left'))
 
-    return {"last_day_has_leak": data[1]}
+    return {"last_day_has_leak": bool(data[1])}
 
 
 @app.route('/center_of_buildings_with_leaks')
@@ -112,14 +111,14 @@ def get_all_buildings():
         {"name": "HarrellHall_Supply", "id": 59},
         {"name": "WhiteHall_Supply", "id": 978},
         {"name": "HarringtonHall_Supply", "id": 981},
-        {"name": "SpenceHall_Return", "id": 56},
+        #{"name": "SpenceHall_Return", "id": 56}, #bad data
         {"name": "BriggsHall_Return", "id": 65},
-        {"name": "WhitelyHall_Return", "id": 980},
+        #{"name": "WhitelyHall_Return", "id": 980}, #bad data
         {"name": "HarringtonHall_Return", "id": 981},
         {"name": "WellsResidenceHall_Supply", "id": 660},
         {"name": "EpprightResidenceHall_Supply", "id": 677},
         {"name": "UnderwoodResidenceHall_Supply", "id": 66},
-        {"name": "DuncanDiningHall_Supply", "id": 688},
+        #{"name": "DuncanDiningHall_Supply", "id": 688}, #duncan building has too much variation
     ]}
 
 
